@@ -3,74 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gráfico de Sentimientos Mensuales</title>
-    <!-- Importar la librería de Chart.js -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f4f4f9;
-        }
-        .container {
-            width: 80%;
-            margin: 0 auto;
-            padding: 20px;
-        }
-        h1 {
-            text-align: center;
-        }
-        #sentimentChart {
-            width: 100%;
-            height: 400px;
-        }
-        .form-group {
-            margin: 20px 0;
-        }
-        #yearSelector {
-            padding: 10px;
-            font-size: 16px;
-        }
-        input[type="file"] {
-            padding: 10px;
-            font-size: 16px;
-        }
-        button {
-            padding: 10px 20px;
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            font-size: 16px;
-            cursor: pointer;
-        }
-        button:hover {
-            background-color: #45a049;
-        }
-    </style>
+    <title>Cargar archivo CSV</title>
 </head>
 <body>
 
-    <div class="container">
-        <h1>Gráfico de Sentimientos Mensuales</h1>
+    <h2>Sube tu archivo CSV</h2>
 
-        <!-- Formulario para cargar el archivo CSV -->
-        <div class="form-group">
-            <input type="file" id="csvFile" accept=".csv">
-            <button onclick="uploadFile()">Cargar Archivo CSV</button>
-        </div>
-
-        <!-- Selector de años -->
-        <div class="form-group">
-            <label for="yearSelector">Selecciona el Año:</label>
-            <select id="yearSelector" onchange="cambiarAno()">
-                <option value="">Seleccione un año</option>
-            </select>
-        </div>
-
-        <!-- Lienzo para el gráfico -->
-        <canvas id="sentimentChart"></canvas>
-    </div>
+    <!-- Formulario para cargar el archivo CSV -->
+    <input type="file" id="csvFile" accept=".csv" />
+    <button id="uploadBtn">Subir archivo</button>
 
     <script src="app.js"></script>
 </body>
