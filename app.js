@@ -23,8 +23,8 @@ const uploadFile = async () => {
 
         if (result.mensaje) {
             alert(result.mensaje); // Muestra confirmación de la subida
-            if (result.resumen_mensual) {
-                procesarResumenMensual(result.resumen_mensual);  // Procesamos el resumen mensual
+            if (result.resumen_mensual) {  // Cambié el nombre aquí
+                procesarResumenMensual(result.resumen_mensual);  // Cambié el nombre aquí
             } else {
                 console.error("No se recibieron los datos esperados.");
                 alert('Error: los datos recibidos no son válidos.');
@@ -78,13 +78,14 @@ const displayGraph = (resumen, year) => {
 
             // Calcular el sentimiento de cada reseña
             datosMes.reseñas.forEach(reseña => {
-                const sentiment = reseña.sentimiento; // Se espera que cada reseña tenga un campo de sentimiento: "positiva", "negativa", o "mixta"
+                const sentiment = reseña.sentimiento; // Se espera que cada reseña tenga un campo de sentimiento: "positiva", "negativa", o "neutral"
+                
                 if (sentiment === 'positiva') {
                     totalSentimiento += 1; // Añadir 1 por reseña positiva
                 } else if (sentiment === 'negativa') {
                     totalSentimiento += 0; // Añadir 0 por reseña negativa
-                } else if (sentiment === 'mixta') {
-                    totalSentimiento += 0.5; // Añadir 0.5 por reseña mixta
+                } else if (sentiment === 'neutral') {
+                    totalSentimiento += 0.5; // Añadir 0.5 por reseña neutral
                 }
             });
 
@@ -92,7 +93,7 @@ const displayGraph = (resumen, year) => {
             const promedioSentimiento = totalSentimiento / totalReseñas;
             sentimentScores.push(promedioSentimiento);
         } else {
-            sentimentScores.push(0.5); // Si no hay reseñas, asignar el valor mixto (0.5)
+            sentimentScores.push(0.5); // Si no hay reseñas, asignar el valor neutral (0.5)
         }
     }
 
@@ -124,7 +125,7 @@ const displayGraph = (resumen, year) => {
                         callback: function(value) {
                             if (value === 1) return 'Buena';
                             if (value === 0) return 'Mala';
-                            return 'Mixta';
+                            return 'Neutral';
                         }
                     },
                     title: {
