@@ -19,7 +19,7 @@ const uploadFile = async () => {
         });
 
         const result = await response.json();
-        console.log(result); // Para ver los datos en la consola
+        console.log('Datos recibidos:', result); // <-- Agregar para depurar
 
         if (response.ok) {
             resumenMensualGlobal = result.resumen_mensual;
@@ -67,30 +67,39 @@ const handleYearChange = () => {
 };
 
 const displayGraph = (resumen, year) => {
-    const meses = Object.keys(resumen).filter(mes => mes.startsWith(year));  // Filtrar por año
+    // Filtramos los meses que corresponden al año seleccionado
+    const meses = Object.keys(resumen).filter(mes => mes.startsWith(year));  
+    console.log('Meses filtrados:', meses); // <-- Verifica que los meses estén correctamente filtrados
+
     const sentimientos = [];
 
     meses.forEach(mes => {
         const promedioPositiva = resumen[mes].PromedioPositiva || 0;
         const promedioNegativa = resumen[mes].PromedioNegativa || 0;
         
-        // Clasificación del mes según la comparación de los promedios
-        let clasificacion = 'MALA';  // Por defecto, es MALA
+        // Clasificación del mes según los promedios
+        let clasificacion = 'MALA';  // Por defecto es MALA
         if (promedioPositiva > promedioNegativa) {
             clasificacion = 'BUENA';
         } else if (promedioPositiva === promedioNegativa) {
             clasificacion = 'MEDIA';
         }
 
+        // Depuración: Verificar la clasificación de cada mes
+        console.log(`Mes: ${mes}, Positiva: ${promedioPositiva}, Negativa: ${promedioNegativa}, Clasificación: ${clasificacion}`);
+
         sentimientos.push(clasificacion);
     });
 
-    // Asignación de colores para cada sentimiento
+    // Asignación de colores para cada clasificación
     const colores = {
         'BUENA': 'green',
         'MEDIA': 'gray',
         'MALA': 'red'
     };
+
+    // Comprobar los datos que estamos pasando al gráfico
+    console.log('Sentimientos:', sentimientos);  // <-- Verificar los sentimientos que pasamos al gráfico
 
     // Configuración del gráfico de barras
     const ctx = document.getElementById('sentimentChart').getContext('2d');
@@ -122,8 +131,8 @@ const displayGraph = (resumen, year) => {
                         display: true,
                         text: 'Clasificación Sentimiento'  // Título para el eje Y
                     },
-                    // Definir las etiquetas para el eje Y (BUENA, MEDIA, MALA)
                     ticks: {
+                        // Mostrar las categorías en el eje Y: BUENA, MEDIA, MALA
                         callback: function(value) {
                             switch(value) {
                                 case 'BUENA': return 'BUENA';
