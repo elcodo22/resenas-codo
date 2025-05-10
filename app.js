@@ -68,6 +68,7 @@ const displayGraph = (resumen, year) => {
 
     const sentimentScores = [];
 
+    // Iterar sobre los meses para calcular el puntaje de sentimiento
     for (let i = 0; i < 12; i++) {
         const mesClave = `${year}-${String(i + 1).padStart(2, '0')}`;
         const datosMes = resumen[mesClave];
@@ -83,6 +84,8 @@ const displayGraph = (resumen, year) => {
                     totalSentimiento += 1; // Añadir 1 por reseña positiva
                 } else if (sentiment === 'negativa') {
                     totalSentimiento += 0; // Añadir 0 por reseña negativa
+                } else if (sentiment === 'mixta') {
+                    totalSentimiento += 0.5; // Añadir 0.5 por reseña mixta
                 }
             });
 
