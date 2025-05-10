@@ -54,9 +54,9 @@ const renderGrafico = (resumenMensual) => {
 
     // Meses ordenados de enero a diciembre
     const mesesOrdenados = [
-        "2024-01-01", "2024-02-01", "2024-03-01", "2024-04-01", "2024-05-01", 
-        "2024-06-01", "2024-07-01", "2024-08-01", "2024-09-01", "2024-10-01", 
-        "2024-11-01", "2024-12-01"
+        "2024-01", "2024-02", "2024-03", "2024-04", "2024-05", 
+        "2024-06", "2024-07", "2024-08", "2024-09", "2024-10", 
+        "2024-11", "2024-12"
     ];
 
     // Creamos un array de etiquetas para los meses en español
@@ -64,22 +64,24 @@ const renderGrafico = (resumenMensual) => {
 
     // Calculamos la media para cada mes
     const medias = mesesOrdenados.map(mes => {
-        const valores = resumenMensual[mes]; // Obtenemos los valores de ese mes
+        let positivas = 0;
+        let mixtas = 0;
+        let negativas = 0;
+        let totalReseñas = 0;
 
-        // Si no hay datos para ese mes, lo consideramos 0
-        if (!valores) {
-            return 0;
-        }
+        // Iteramos sobre los días de ese mes para sumar las reseñas
+        Object.keys(resumenMensual).forEach(fecha => {
+            if (fecha.startsWith(mes)) { // Verificamos que la fecha corresponda a ese mes
+                const valores = resumenMensual[fecha];
 
-        // Obtenemos el número de reseñas de cada tipo
-        const positivas = valores.positivas || 0;
-        const mixtas = valores.mixtas || 0;
-        const negativas = valores.negativas || 0;
+                positivas += valores.positivas;
+                mixtas += valores.mixtas;
+                negativas += valores.negativas;
+                totalReseñas += valores.totalReseñas;
+            }
+        });
 
-        // El total de reseñas es la suma de las reseñas positivas, mixtas y negativas en ese mes
-        const totalReseñas = positivas + mixtas + negativas;
-
-        // Si no hay reseñas, el total será 1 para evitar división por 0
+        // Si no hay reseñas en el mes, devolvemos 0 (evitamos la división por cero)
         if (totalReseñas === 0) {
             return 0;
         }
