@@ -69,7 +69,7 @@ const handleYearChange = () => {
 const displayGraph = (resumen, year) => {
     // Filtramos los meses que corresponden al año seleccionado
     const meses = Object.keys(resumen).filter(mes => mes.startsWith(year));  
-    console.log('Meses filtrados:', meses); // <-- Verifica que los meses estén correctamente filtrados
+    console.log('Meses filtrados:', meses);  // <-- Verifica que los meses estén correctamente filtrados
 
     const sentimientos = [];
 
@@ -109,7 +109,15 @@ const displayGraph = (resumen, year) => {
             labels: meses,  // Meses en el eje X
             datasets: [{
                 label: 'Sentimiento',
-                data: sentimientos.map(sentimiento => sentimiento),  // Clasificación por mes
+                data: sentimientos.map(sentimiento => {
+                    // Asignar un valor numérico a cada clasificación para el eje Y
+                    switch (sentimiento) {
+                        case 'BUENA': return 1;
+                        case 'MEDIA': return 0;
+                        case 'MALA': return -1;
+                        default: return 0;
+                    }
+                }),  // Convertir las clasificaciones a valores numéricos
                 backgroundColor: sentimientos.map(sentimiento => colores[sentimiento]),
                 borderColor: sentimientos.map(sentimiento => colores[sentimiento]),
                 borderWidth: 1
@@ -132,16 +140,19 @@ const displayGraph = (resumen, year) => {
                         text: 'Clasificación Sentimiento'  // Título para el eje Y
                     },
                     ticks: {
-                        // Mostrar las categorías en el eje Y: BUENA, MEDIA, MALA
+                        // Personalizar los ticks para que muestren 'BUENA', 'MEDIA', 'MALA'
                         callback: function(value) {
                             switch(value) {
-                                case 'BUENA': return 'BUENA';
-                                case 'MEDIA': return 'MEDIA';
-                                case 'MALA': return 'MALA';
+                                case 1: return 'BUENA';
+                                case 0: return 'MEDIA';
+                                case -1: return 'MALA';
                                 default: return value;
                             }
                         }
-                    }
+                    },
+                    min: -1,  // Valor mínimo (MALA)
+                    max: 1,   // Valor máximo (BUENA)
+                    stepSize: 1
                 }
             },
             plugins: {
@@ -151,7 +162,13 @@ const displayGraph = (resumen, year) => {
                 tooltip: {
                     callbacks: {
                         label: function(tooltipItem) {
-                            return `Sentimiento: ${tooltipItem.raw}`;
+                            // Muestra el valor de la clasificación (por ejemplo, BUENA, MEDIA, MALA)
+                            switch(tooltipItem.raw) {
+                                case 1: return 'Sentimiento: BUENA';
+                                case 0: return 'Sentimiento: MEDIA';
+                                case -1: return 'Sentimiento: MALA';
+                                default: return `Sentimiento: ${tooltipItem.raw}`;
+                            }
                         }
                     }
                 }
@@ -159,3 +176,4 @@ const displayGraph = (resumen, year) => {
         }
     });
 };
+
