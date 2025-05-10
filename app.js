@@ -1,11 +1,18 @@
 let resumenMensualGlobal = {};  // Guardar todos los datos cargados
 let añosDisponibles = [];  // Guardar los años disponibles
 
+// Función para subir el archivo CSV
 const uploadFile = async () => {
     const fileInput = document.getElementById('csvFile');
     const file = fileInput.files[0];
     if (!file) {
         alert('Por favor, selecciona un archivo CSV');
+        return;
+    }
+
+    // Verificar que el archivo sea CSV
+    if (file.type !== 'text/csv') {
+        alert('Por favor, selecciona un archivo CSV válido');
         return;
     }
 
@@ -18,10 +25,15 @@ const uploadFile = async () => {
             body: formData,
         });
 
-        const result = await response.json();
-        console.log('Datos recibidos:', result); // <-- Agregar para depurar
+        // Verificar la respuesta
+        if (!response.ok) {
+            throw new Error('Error al subir el archivo. Código de estado: ' + response.status);
+        }
 
-        if (response.ok) {
+        const result = await response.json();
+        console.log('Datos recibidos:', result);
+
+        if (result.resumen_mensual) {
             resumenMensualGlobal = result.resumen_mensual;
             // Extraer los años disponibles
             añosDisponibles = Object.keys(resumenMensualGlobal).map(mes => mes.split('-')[0]);
@@ -32,17 +44,19 @@ const uploadFile = async () => {
             // Mostrar el análisis del primer año disponible
             displayGraph(resumenMensualGlobal, añosDisponibles[0]);
         } else {
-            alert(result.mensaje);
+            alert('No se encontró el resumen mensual en la respuesta');
         }
     } catch (error) {
-        alert('Error al subir el archivo');
+        alert('Error al subir el archivo: ' + error.message);
     }
 };
 
 // Llenar el selector de años
 const fillYearSelector = () => {
     const yearSelector = document.getElementById('yearSelector');
-    yearSelector.innerHTML = "";  // Limpiar cualquier opción previa
+    while (yearSelector.firstChild) {
+        yearSelector.removeChild(yearSelector.firstChild); // Eliminar las opciones previas
+    }
 
     // Agregar la opción "Selecciona un año"
     const defaultOption = document.createElement('option');
@@ -67,22 +81,22 @@ const handleYearChange = () => {
 };
 
 // Función para mostrar el gráfico
-const displayGraph = (resumen) => {
+const displayGraph = (resumen, year) => {
     const meses = [
         "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"
     ];
-    
+
     const clasificaciones = [];
+    const yearPrefix = `${year}-`;
 
-    // Para cada mes en el año, verificamos las reseñas y calculamos la clasificación
+    // Para cada mes del año seleccionado
     meses.forEach((mes, index) => {
-        const mesKey = `2024-${(index + 1).toString().padStart(2, '0')}`;
+        const mesKey = `${yearPrefix}${(index + 1).toString().padStart(2, '0')}`;
 
-        let clasificacion = "Mala"; // Clasificación predeterminada si no hay reseñas
+        let clasificacion = "Mala"; // Clasificación predeterminada
         if (resumen[mesKey]) {
             const { Positive, Negative, Neutral, Mixed } = resumen[mesKey];
 
-            // Clasificación basada en los valores de las categorías
             if (Positive && parseFloat(Positive.N) > 0.5) {
                 clasificacion = "Buena";
             } else if (Negative && parseFloat(Negative.N) > 0.5) {
