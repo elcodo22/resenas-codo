@@ -1,25 +1,15 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Subir CSV y Ver Resultados</title>
-    <link rel="stylesheet" href="style.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Resumen Mensual de Reseñas</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-    <div class="container">
-        <h1>Análisis de Sentimientos</h1>
-        
-        <!-- Selector de Año -->
-        <select id="yearSelector" onchange="handleYearChange()"></select>
-
-        <input type="file" id="csvFile" accept=".csv">
-        <button onclick="uploadFile()">Subir Archivo</button>
-
-        <canvas id="sentimentChart" width="600" height="300"></canvas>
-    </div>
-
-    <script src="app.js"></script>
+  <h2>Resumen Mensual de Reseñas</h2>
+  <canvas id="sentimentChart" width="800" height="400"></canvas>
+  <script src="app.js"></script>
 </body>
 </html>
