@@ -75,7 +75,14 @@ const renderGrafico = (resumenMensual) => {
         const positivas = valores.positivas || 0;
         const mixtas = valores.mixtas || 0;
         const negativas = valores.negativas || 0;
-        const totalReseñas = valores.totalReseñas || 1; // Aseguramos que no divida por 0
+
+        // El total de reseñas es la suma de las reseñas positivas, mixtas y negativas en ese mes
+        const totalReseñas = positivas + mixtas + negativas;
+
+        // Si no hay reseñas, el total será 1 para evitar división por 0
+        if (totalReseñas === 0) {
+            return 0;
+        }
 
         // Calculamos la puntuación ponderada de cada tipo de reseña
         const puntuacionPositivas = positivas * 1;   // 1 para positivas
@@ -132,4 +139,3 @@ const renderGrafico = (resumenMensual) => {
         }
     });
 };
-
