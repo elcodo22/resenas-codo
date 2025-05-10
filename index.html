@@ -1,161 +1,27 @@
-let resumenMensualGlobal = {};  // Guardar todos los datos cargados
-let añosDisponibles = [];  // Guardar los años disponibles
-
-const uploadFile = async () => {
-    const fileInput = document.getElementById('csvFile');
-    const file = fileInput.files[0];
-    if (!file) {
-        alert('Por favor, selecciona un archivo CSV');
-        return;
-    }
-
-    const formData = new FormData();
-    formData.append('csv', file);
-
-    try {
-        const response = await fetch('http://35.177.116.70:3000/upload', {
-            method: 'POST',
-            body: formData,
-        });
-
-        const result = await response.json();
-        console.log('Datos recibidos:', result); // <-- Agregar para depurar
-
-        if (response.ok) {
-            resumenMensualGlobal = result.resumen_mensual;
-            // Extraer los años disponibles
-            añosDisponibles = Object.keys(resumenMensualGlobal).map(mes => mes.split('-')[0]);
-            añosDisponibles = [...new Set(añosDisponibles)];  // Eliminar duplicados
-
-            // Llenar el selector de años
-            fillYearSelector();
-            // Mostrar el análisis del primer año disponible
-            displayGraph(resumenMensualGlobal, añosDisponibles[0]);
-        } else {
-            alert(result.mensaje);
-        }
-    } catch (error) {
-        alert('Error al subir el archivo');
-    }
-};
-
-// Llenar el selector de años
-const fillYearSelector = () => {
-    const yearSelector = document.getElementById('yearSelector');
-    yearSelector.innerHTML = "";  // Limpiar cualquier opción previa
-
-    // Agregar la opción "Selecciona un año"
-    const defaultOption = document.createElement('option');
-    defaultOption.text = "Selecciona un año";
-    yearSelector.add(defaultOption);
-
-    // Agregar los años disponibles al selector
-    añosDisponibles.forEach(year => {
-        const option = document.createElement('option');
-        option.value = year;
-        option.text = year;
-        yearSelector.add(option);
-    });
-};
-
-// Filtrar y mostrar los datos según el año seleccionado
-const handleYearChange = () => {
-    const selectedYear = document.getElementById('yearSelector').value;
-    if (selectedYear !== "Selecciona un año") {
-        displayGraph(resumenMensualGlobal, selectedYear);
-    }
-};
-
-const displayGraph = (resumen, year) => {
-    // Filtramos los meses que corresponden al año seleccionado
-    const meses = Object.keys(resumen).filter(mes => mes.startsWith(year));  
-    console.log('Meses filtrados:', meses); // <-- Verifica que los meses estén correctamente filtrados
-
-    const sentimientos = [];
-
-    meses.forEach(mes => {
-        const promedioPositiva = resumen[mes].PromedioPositiva || 0;
-        const promedioNegativa = resumen[mes].PromedioNegativa || 0;
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Subir CSV y Ver Resultados</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h1>Análisis de Sentimientos</h1>
         
-        // Clasificación del mes según los promedios
-        let clasificacion = 'MALA';  // Por defecto es MALA
-        if (promedioPositiva > promedioNegativa) {
-            clasificacion = 'BUENA';
-        } else if (promedioPositiva === promedioNegativa) {
-            clasificacion = 'MEDIA';
-        }
+        <!-- Selector de Año -->
+        <select id="yearSelector" onchange="handleYearChange()">
+            <!-- Aquí se llenarán los años dinámicamente -->
+        </select>
 
-        // Depuración: Verificar la clasificación de cada mes
-        console.log(`Mes: ${mes}, Positiva: ${promedioPositiva}, Negativa: ${promedioNegativa}, Clasificación: ${clasificacion}`);
+        <input type="file" id="csvFile" accept=".csv">
+        <button onclick="uploadFile()">Subir Archivo</button>
 
-        sentimientos.push(clasificacion);
-    });
+        <canvas id="sentimentChart" width="400" height="200"></canvas>
+    </div>
 
-    // Asignación de colores para cada clasificación
-    const colores = {
-        'BUENA': 'green',
-        'MEDIA': 'gray',
-        'MALA': 'red'
-    };
-
-    // Comprobar los datos que estamos pasando al gráfico
-    console.log('Sentimientos:', sentimientos);  // <-- Verificar los sentimientos que pasamos al gráfico
-
-    // Configuración del gráfico de barras
-    const ctx = document.getElementById('sentimentChart').getContext('2d');
-    new Chart(ctx, {
-        type: 'bar',
-        data: {
-            labels: meses,  // Meses en el eje X
-            datasets: [{
-                label: 'Sentimiento',
-                data: sentimientos.map(sentimiento => sentimiento),  // Clasificación por mes
-                backgroundColor: sentimientos.map(sentimiento => colores[sentimiento]),
-                borderColor: sentimientos.map(sentimiento => colores[sentimiento]),
-                borderWidth: 1
-            }]
-        },
-        options: {
-            responsive: true,
-            indexAxis: 'x', // Mostrar barras verticales
-            scales: {
-                x: {
-                    title: {
-                        display: true,
-                        text: 'Meses'  // Título para el eje X
-                    }
-                },
-                y: {
-                    beginAtZero: true,
-                    title: {
-                        display: true,
-                        text: 'Clasificación Sentimiento'  // Título para el eje Y
-                    },
-                    ticks: {
-                        // Mostrar las categorías en el eje Y: BUENA, MEDIA, MALA
-                        callback: function(value) {
-                            switch(value) {
-                                case 'BUENA': return 'BUENA';
-                                case 'MEDIA': return 'MEDIA';
-                                case 'MALA': return 'MALA';
-                                default: return value;
-                            }
-                        }
-                    }
-                }
-            },
-            plugins: {
-                legend: {
-                    position: 'top',
-                },
-                tooltip: {
-                    callbacks: {
-                        label: function(tooltipItem) {
-                            return `Sentimiento: ${tooltipItem.raw}`;
-                        }
-                    }
-                }
-            }
-        }
-    });
-};
+    <script src="app.js"></script>
+</body>
+</html>
