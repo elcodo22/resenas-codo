@@ -21,18 +21,20 @@ const uploadFile = async () => {
         const result = await response.json();
         console.log("Respuesta del backend:", result);
 
-        if (result.resumenMensual) {
-            procesarResumenMensual(result.resumenMensual);
-        } else {
-            alert('Archivo subido pero no se devolvió resumen válido.');
+        if (result.mensaje) {
+            alert(result.mensaje); // Muestra confirmación de la subida
+            if (result.resumenMensual) {
+                procesarResumenMensual(result.resumenMensual);
+            } else {
+                console.error("No se recibieron los datos esperados.");
+                alert('Error: los datos recibidos no son válidos.');
+            }
         }
 
     } catch (error) {
-        console.error(error);
-        alert('Error al subir el archivo: ' + error.message);
+        alert('Error: ' + error.message);
     }
 };
-
 
 const procesarResumenMensual = (resumenMensual) => {
     resumenMensualGlobal = resumenMensual;
