@@ -24,7 +24,7 @@ canvas {
     height: 400px;
 }
 
-.button-container {
+.button-container, .file-upload {
     text-align: center;
     margin-top: 20px;
 }
@@ -42,4 +42,8 @@ button {
 
 button:hover {
     background-color: #0056b3;
+}
+
+input[type="file"] {
+    margin-right: 10px;
 }
