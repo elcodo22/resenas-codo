@@ -57,6 +57,14 @@ const cambiarAno = () => {
     displayGraph(resumenMensualGlobal, selectedYear);
 };
 
+// Función para asignar los valores "Mala", "Media", "Buena" dependiendo del valor
+const getSentimentLevel = (average) => {
+    if (average === null) return "Mixed";
+    if (average >= 0.66) return "Buena";
+    if (average >= 0.33) return "Media";
+    return "Mala";
+};
+
 const displayGraph = (resumen, year) => {
     const meses = [
         "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
@@ -72,13 +80,13 @@ const displayGraph = (resumen, year) => {
         const datosMes = resumen[mesClave];
 
         if (datosMes && datosMes.total > 0) {
-            // Calcular la media de la reseña positiva, tomando el promedio de la reseña positiva y negativa
-            const media = (datosMes.PromedioPositiva + datosMes.PromedioNegativa) / 2;
-            // Agregar la media al array de datos
+            // Calcular la media de la reseña positiva
+            const media = datosMes.PromedioPositiva; // Puedes usar el promedio entre positiva y negativa si prefieres
+            // Convertir la media al nivel cualitativo
             datosSentimiento.push(media);
         } else {
-            // Si no hay reseñas, asignar el valor "Mixed" con valor 0.5
-            datosSentimiento.push(0.5);
+            // Si no hay datos para el mes, asignamos "Mixed"
+            datosSentimiento.push(null);
         }
 
         etiquetas.push(meses[i]);
@@ -110,19 +118,19 @@ const displayGraph = (resumen, year) => {
             responsive: true,
             scales: {
                 y: {
-                    min: 0, // Empieza en 0
-                    max: 1, // Termina en 1
-                    stepSize: 0.1, // Intervalo de 0.1 para los valores
+                    beginAtZero: true,
+                    min: 0,
+                    max: 2,
+                    stepSize: 1,
                     ticks: {
                         callback: function(value) {
-                            if (value === 0) return 'Mala';
-                            if (value === 0.5) return 'Mixta';
-                            if (value === 1) return 'Buena';
-                            return ''; // Para valores entre 0 y 1, no mostramos etiquetas adicionales
+                            const levels = ["Mala", "Media", "Buena"];
+                            return levels[value] || "Mixed"; // Usamos los niveles de sentimiento
                         }
                     },
                     title: {
-                        display: false // No mostramos título en el eje Y
+                        display: true,
+                        text: 'Nivel de Sentimiento'
                     }
                 }
             },
@@ -131,9 +139,7 @@ const displayGraph = (resumen, year) => {
                     callbacks: {
                         label: function(context) {
                             const value = context.raw;
-                            if (value === 0.5) return "Mixta";
-                            if (value < 0.5) return "Mala";
-                            return "Buena";
+                            return value === null ? "Mixed" : getSentimentLevel(value);
                         }
                     }
                 }
