@@ -10,6 +10,12 @@
 <body>
     <div class="container">
         <h1>Análisis de Sentimientos</h1>
+        
+        <!-- Selector de Año -->
+        <select id="yearSelector" onchange="handleYearChange()">
+            <!-- Aquí se llenarán los años dinámicamente -->
+        </select>
+
         <input type="file" id="csvFile" accept=".csv">
         <button onclick="uploadFile()">Subir Archivo</button>
 
