@@ -48,41 +48,47 @@ const cargarResumenDesdeDynamo = async () => {
     }
 };
 
+// Función para renderizar el gráfico
 const renderGrafico = (resumenMensual) => {
     const ctx = document.getElementById('graficoResenas').getContext('2d');
 
-    // Obtenemos las claves de los meses y las ordenamos
+    // Meses ordenados de enero a diciembre
     const mesesOrdenados = [
         "2024-01-01", "2024-02-01", "2024-03-01", "2024-04-01", "2024-05-01", 
         "2024-06-01", "2024-07-01", "2024-08-01", "2024-09-01", "2024-10-01", 
         "2024-11-01", "2024-12-01"
     ];
 
-    // Creamos un array de etiquetas para los meses (en español)
+    // Creamos un array de etiquetas para los meses en español
     const etiquetasMeses = ["ENERO", "FEBRERO", "MARZO", "ABRIL", "MAYO", "JUNIO", "JULIO", "AGOSTO", "SEPTIEMBRE", "OCTUBRE", "NOVIEMBRE", "DICIEMBRE"];
 
-    // Creamos el array de medias para cada mes
+    // Calculamos la media para cada mes
     const medias = mesesOrdenados.map(mes => {
-        const valores = resumenMensual[mes]; // Accedemos a los valores para ese mes
+        const valores = resumenMensual[mes]; // Obtenemos los valores de ese mes
 
-        // Si no hay reseñas para ese mes, lo consideramos 0
+        // Si no hay datos para ese mes, lo consideramos 0
         if (!valores) {
             return 0;
         }
 
-        // Obtenemos los valores de cada tipo de sentimiento
+        // Obtenemos el número de reseñas de cada tipo
         const positivas = valores.positivas || 0;
         const mixtas = valores.mixtas || 0;
         const negativas = valores.negativas || 0;
         const totalReseñas = valores.totalReseñas || 1; // Aseguramos que no divida por 0
 
-        // Calculamos la media para ese mes:
-        const porcentajePositivas = (positivas / totalReseñas) * 1; // 1 para positivas
-        const porcentajeMixtas = (mixtas / totalReseñas) * 0.5; // 0.5 para mixtas
-        const porcentajeNegativas = (negativas / totalReseñas) * 0; // 0 para negativas
+        // Calculamos la puntuación ponderada de cada tipo de reseña
+        const puntuacionPositivas = positivas * 1;   // 1 para positivas
+        const puntuacionMixtas = mixtas * 0.5;       // 0.5 para mixtas
+        const puntuacionNegativas = negativas * 0;    // 0 para negativas
 
-        // Media final sumando las puntuaciones
-        return porcentajePositivas + porcentajeMixtas + porcentajeNegativas;
+        // Sumamos las puntuaciones ponderadas
+        const totalPonderado = puntuacionPositivas + puntuacionMixtas + puntuacionNegativas;
+
+        // Calculamos la media dividiendo por el total de reseñas
+        const media = totalPonderado / totalReseñas;
+
+        return media;
     });
 
     // Creamos el gráfico
@@ -126,3 +132,4 @@ const renderGrafico = (resumenMensual) => {
         }
     });
 };
+
