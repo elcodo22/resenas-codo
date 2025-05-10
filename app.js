@@ -1,5 +1,5 @@
-let resumenMensualGlobal = {};  // Guardar el resumen agrupado por mes
-let añosDisponibles = [];       // Lista de años únicos disponibles
+let resumenMensualGlobal = {};
+let añosDisponibles = [];
 
 const uploadFile = async () => {
     const fileInput = document.getElementById('csvFile');
@@ -22,9 +22,12 @@ const uploadFile = async () => {
 
         const result = await response.json();
 
+        console.log("Respuesta del backend:", result);
+
         if (Array.isArray(result)) {
             procesarDatos(result);
         } else {
+            console.error("Formato inesperado:", result);
             alert('Error: los datos recibidos no son válidos.');
         }
     } catch (error) {
@@ -40,31 +43,40 @@ const procesarDatos = (datos) => {
         const year = fecha.getFullYear();
         const month = String(fecha.getMonth() + 1).padStart(2, '0');
         const key = `${year}-${month}`;
-        const sentimiento = entry.sentimiento.toUpperCase();
+
+        const puntuaciones = JSON.parse(entry.puntuaciones);
+
+        const pos = parseFloat(puntuaciones.Positive.N);
+        const neg = parseFloat(puntuaciones.Negative.N);
+        const mix = parseFloat(puntuaciones.Mixed.N);
 
         if (!resumenMensualGlobal[key]) {
             resumenMensualGlobal[key] = {
-                POSITIVE: 0,
-                NEGATIVE: 0,
-                MIXED: 0,
-                total: 0
+                count: 0,
+                sumPos: 0,
+                sumNeg: 0,
+                sumMix: 0
             };
         }
 
-        if (["POSITIVE", "NEGATIVE", "MIXED"].includes(sentimiento)) {
-            resumenMensualGlobal[key][sentimiento]++;
-            resumenMensualGlobal[key].total++;
-        }
+        resumenMensualGlobal[key].count += 1;
+        resumenMensualGlobal[key].sumPos += pos;
+        resumenMensualGlobal[key].sumNeg += neg;
+        resumenMensualGlobal[key].sumMix += mix;
     });
 
     añosDisponibles = [...new Set(Object.keys(resumenMensualGlobal).map(m => m.split('-')[0]))];
     fillYearSelector();
-    displayGraph(añosDisponibles[0]);
+    displayGraph(resumenMensualGlobal, añosDisponibles[0]);
 };
 
 const fillYearSelector = () => {
     const yearSelector = document.getElementById('yearSelector');
     yearSelector.innerHTML = '';
+
+    const defaultOption = document.createElement('option');
+    defaultOption.text = "Selecciona un año";
+    yearSelector.appendChild(defaultOption);
 
     añosDisponibles.forEach(year => {
         const option = document.createElement('option');
@@ -76,32 +88,34 @@ const fillYearSelector = () => {
 
 const handleYearChange = () => {
     const selectedYear = document.getElementById('yearSelector').value;
-    displayGraph(selectedYear);
+    if (selectedYear !== "Selecciona un año") {
+        displayGraph(resumenMensualGlobal, selectedYear);
+    }
 };
 
-const displayGraph = (year) => {
+const displayGraph = (resumen, year) => {
     const meses = [
         "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
         "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"
     ];
 
-    const positiveData = [];
-    const negativeData = [];
-    const mixedData = [];
+    const datosPositivos = [];
+    const datosNegativos = [];
+    const datosMixtos = [];
 
     for (let i = 0; i < 12; i++) {
         const mesClave = `${year}-${String(i + 1).padStart(2, '0')}`;
-        const datosMes = resumenMensualGlobal[mesClave];
+        const datosMes = resumen[mesClave];
 
-        if (!datosMes) {
-            positiveData.push(0);
-            negativeData.push(0);
-            mixedData.push(0);
+        if (datosMes) {
+            const total = datosMes.count;
+            datosPositivos.push(datosMes.sumPos / total);
+            datosNegativos.push(datosMes.sumNeg / total);
+            datosMixtos.push(datosMes.sumMix / total);
         } else {
-            const total = datosMes.total || 1; // evita división por cero
-            positiveData.push(datosMes.POSITIVE / total);
-            negativeData.push(datosMes.NEGATIVE / total);
-            mixedData.push(datosMes.MIXED / total);
+            datosPositivos.push(0);
+            datosNegativos.push(0);
+            datosMixtos.push(0);
         }
     }
 
@@ -116,19 +130,19 @@ const displayGraph = (year) => {
             labels: meses,
             datasets: [
                 {
-                    label: 'Positivas',
-                    data: positiveData,
-                    backgroundColor: 'green'
+                    label: 'Positivo',
+                    data: datosPositivos,
+                    backgroundColor: 'rgba(75, 192, 192, 0.7)'
                 },
                 {
-                    label: 'Negativas',
-                    data: negativeData,
-                    backgroundColor: 'red'
+                    label: 'Negativo',
+                    data: datosNegativos,
+                    backgroundColor: 'rgba(255, 99, 132, 0.7)'
                 },
                 {
-                    label: 'Mixtas',
-                    data: mixedData,
-                    backgroundColor: 'orange'
+                    label: 'Mixto',
+                    data: datosMixtos,
+                    backgroundColor: 'rgba(255, 206, 86, 0.7)'
                 }
             ]
         },
@@ -138,29 +152,10 @@ const displayGraph = (year) => {
                 y: {
                     beginAtZero: true,
                     max: 1,
-                    ticks: {
-                        callback: function (value) {
-                            return (value * 100).toFixed(0) + '%';
-                        }
-                    },
                     title: {
                         display: true,
-                        text: 'Porcentaje'
+                        text: 'Media del Sentimiento'
                     }
-                }
-            },
-            plugins: {
-                tooltip: {
-                    callbacks: {
-                        label: ctx => `${ctx.dataset.label}: ${(ctx.raw * 100).toFixed(1)}%`
-                    }
-                },
-                legend: {
-                    position: 'top'
-                },
-                title: {
-                    display: true,
-                    text: `Promedio de sentimientos por mes - ${year}`
                 }
             }
         }
