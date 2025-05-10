@@ -1,128 +1,27 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Generar gráfico</title>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Subir CSV y Ver Resultados</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-  <canvas id="myChart" width="800" height="600"></canvas>
-  <script>
-    // Función para procesar el CSV
-    function processCSV(fileContent) {
-      const data = {};
-      const parsedData = Papa.parse(fileContent, { header: true }).data;
-      
-      parsedData.forEach(row => {
-        const fecha = row['fecha'];
-        const mes = fecha.substring(0, 7); // '2024-01'
+    <div class="container">
+        <h1>Análisis de Sentimientos</h1>
         
-        const puntuaciones = JSON.parse(row['puntuaciones']);
-        
-        if (!data[mes]) {
-          data[mes] = { total: 0, positivo: 0, negativo: 0, mixto: 0 };
-        }
-        
-        const positivo = puntuaciones.Positive ? puntuaciones.Positive.N : 0;
-        const negativo = puntuaciones.Negative ? puntuaciones.Negative.N : 0;
-        const mixto = puntuaciones.Mixed ? puntuaciones.Mixed.N : 0;
-        
-        data[mes].total += 1;
-        data[mes].positivo += positivo;
-        data[mes].negativo += negativo;
-        data[mes].mixto += mixto;
-      });
+        <!-- Selector de Año -->
+        <select id="yearSelector" onchange="handleYearChange()">
+            <!-- Aquí se llenarán los años dinámicamente -->
+        </select>
 
-      return data;
-    }
+        <input type="file" id="csvFile" accept=".csv">
+        <button onclick="uploadFile()">Subir Archivo</button>
 
-    // Función para generar el gráfico
-    function generateChart(data) {
-      const labels = Object.keys(data);
-      const positivo = labels.map(mes => data[mes].positivo / data[mes].total);
-      const negativo = labels.map(mes => data[mes].negativo / data[mes].total);
-      const mixto = labels.map(mes => data[mes].mixto / data[mes].total);
+        <canvas id="sentimentChart" width="400" height="200"></canvas>
+    </div>
 
-      const ctx = document.getElementById('myChart').getContext('2d');
-      const chart = new Chart(ctx, {
-        type: 'line',
-        data: {
-          labels: labels,
-          datasets: [
-            {
-              label: 'Positivo',
-              borderColor: 'green',
-              backgroundColor: 'rgba(0, 255, 0, 0.1)',
-              data: positivo,
-              fill: true
-            },
-            {
-              label: 'Negativo',
-              borderColor: 'red',
-              backgroundColor: 'rgba(255, 0, 0, 0.1)',
-              data: negativo,
-              fill: true
-            },
-            {
-              label: 'Mixto',
-              borderColor: 'orange',
-              backgroundColor: 'rgba(255, 165, 0, 0.1)',
-              data: mixto,
-              fill: true
-            }
-          ]
-        },
-        options: {
-          responsive: true,
-          plugins: {
-            title: {
-              display: true,
-              text: 'Sentimiento por Mes'
-            }
-          },
-          scales: {
-            x: {
-              title: {
-                display: true,
-                text: 'Mes'
-              }
-            },
-            y: {
-              title: {
-                display: true,
-                text: 'Promedio de Sentimiento'
-              },
-              ticks: {
-                beginAtZero: true
-              }
-            }
-          }
-        }
-      });
-    }
-
-    // Cargar el archivo CSV
-    function loadCSV(event) {
-      const file = event.target.files[0];
-      const reader = new FileReader();
-      
-      reader.onload = function(e) {
-        const fileContent = e.target.result;
-        const sentimentData = processCSV(fileContent);
-        generateChart(sentimentData);
-      };
-      
-      reader.readAsText(file);
-    }
-
-    // Crear un input para cargar el archivo CSV
-    const inputFile = document.createElement('input');
-    inputFile.type = 'file';
-    inputFile.accept = '.csv';
-    inputFile.addEventListener('change', loadCSV);
-    document.body.appendChild(inputFile);
-  </script>
+    <script src="app.js"></script>
 </body>
 </html>
