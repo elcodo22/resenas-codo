@@ -19,15 +19,18 @@ const uploadFile = async () => {
         });
 
         const result = await response.json();
-
         console.log("Respuesta del backend:", result);
 
-        if (result.resumen_mensual) {
-            procesarResumenMensual(result.resumen_mensual);
-        } else {
-            console.error("Formato inesperado:", result);
-            alert('Error: los datos recibidos no son válidos.');
+        if (result.mensaje) {
+            alert(result.mensaje); // Muestra confirmación de la subida
+            if (result.resumen_mensual) {  // Cambié el nombre aquí
+                procesarResumenMensual(result.resumen_mensual);  // Cambié el nombre aquí
+            } else {
+                console.error("No se recibieron los datos esperados.");
+                alert('Error: los datos recibidos no son válidos.');
+            }
         }
+
     } catch (error) {
         alert('Error: ' + error.message);
     }
