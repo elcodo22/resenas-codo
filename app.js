@@ -22,7 +22,7 @@ const uploadFile = async () => {
 
         const result = await response.json();
 
-        if (result && Array.isArray(result)) {
+        if (Array.isArray(result)) {
             procesarDatos(result);
         } else {
             alert('Error: los datos recibidos no son válidos.');
@@ -33,51 +33,38 @@ const uploadFile = async () => {
 };
 
 const procesarDatos = (datos) => {
-    resumenMensualGlobal = {}; // Reiniciar
+    resumenMensualGlobal = {};
 
     datos.forEach(entry => {
         const fecha = new Date(entry.fecha);
         const year = fecha.getFullYear();
         const month = String(fecha.getMonth() + 1).padStart(2, '0');
         const key = `${year}-${month}`;
-
-        const puntuaciones = JSON.parse(entry.puntuaciones);
-        let clasificacion = 'Neutral'; // Default
-
-        const pos = parseFloat(puntuaciones.Positive.N);
-        const neg = parseFloat(puntuaciones.Negative.N);
-        const mix = parseFloat(puntuaciones.Mixed.N);
-
-        if (pos > 0.5) clasificacion = 'Buena';
-        else if (neg > 0.5) clasificacion = 'Mala';
-        else if (mix > 0.5) clasificacion = 'Mixta';
+        const sentimiento = entry.sentimiento.toUpperCase();
 
         if (!resumenMensualGlobal[key]) {
             resumenMensualGlobal[key] = {
-                Buana: 0,
-                Mala: 0,
-                Mixta: 0,
-                Neutral: 0
+                POSITIVE: 0,
+                NEGATIVE: 0,
+                MIXED: 0,
+                total: 0
             };
         }
 
-        resumenMensualGlobal[key][clasificacion]++;
+        if (["POSITIVE", "NEGATIVE", "MIXED"].includes(sentimiento)) {
+            resumenMensualGlobal[key][sentimiento]++;
+            resumenMensualGlobal[key].total++;
+        }
     });
 
-    // Extraer años únicos
     añosDisponibles = [...new Set(Object.keys(resumenMensualGlobal).map(m => m.split('-')[0]))];
-
     fillYearSelector();
-    displayGraph(resumenMensualGlobal, añosDisponibles[0]);
+    displayGraph(añosDisponibles[0]);
 };
 
 const fillYearSelector = () => {
     const yearSelector = document.getElementById('yearSelector');
     yearSelector.innerHTML = '';
-
-    const defaultOption = document.createElement('option');
-    defaultOption.text = "Selecciona un año";
-    yearSelector.appendChild(defaultOption);
 
     añosDisponibles.forEach(year => {
         const option = document.createElement('option');
@@ -89,57 +76,35 @@ const fillYearSelector = () => {
 
 const handleYearChange = () => {
     const selectedYear = document.getElementById('yearSelector').value;
-    if (selectedYear !== "Selecciona un año") {
-        displayGraph(resumenMensualGlobal, selectedYear);
-    }
+    displayGraph(selectedYear);
 };
 
-const displayGraph = (resumen, year) => {
+const displayGraph = (year) => {
     const meses = [
         "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
         "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"
     ];
 
-    const clasificaciones = [];
+    const positiveData = [];
+    const negativeData = [];
+    const mixedData = [];
 
     for (let i = 0; i < 12; i++) {
         const mesClave = `${year}-${String(i + 1).padStart(2, '0')}`;
-        const datosMes = resumen[mesClave];
+        const datosMes = resumenMensualGlobal[mesClave];
 
         if (!datosMes) {
-            clasificaciones.push("Sin datos");
-            continue;
+            positiveData.push(0);
+            negativeData.push(0);
+            mixedData.push(0);
+        } else {
+            const total = datosMes.total || 1; // evita división por cero
+            positiveData.push(datosMes.POSITIVE / total);
+            negativeData.push(datosMes.NEGATIVE / total);
+            mixedData.push(datosMes.MIXED / total);
         }
-
-        // Determinar la clasificación dominante
-        const conteos = {
-            "Buena": datosMes.Buena || 0,
-            "Mala": datosMes.Mala || 0,
-            "Mixta": datosMes.Mixta || 0,
-            "Neutral": datosMes.Neutral || 0
-        };
-
-        const clasificacion = Object.keys(conteos).reduce((a, b) => conteos[a] > conteos[b] ? a : b);
-        clasificaciones.push(clasificacion);
     }
 
-    const colores = {
-        "Buena": "green",
-        "Mixta": "orange",
-        "Neutral": "yellow",
-        "Mala": "red",
-        "Sin datos": "gray"
-    };
-
-    const valoresNumericos = clasificaciones.map(cl => {
-        if (cl === "Buena") return 1;
-        if (cl === "Mixta") return 2;
-        if (cl === "Neutral") return 3;
-        if (cl === "Mala") return 4;
-        return 5; // Sin datos
-    });
-
-    // Destruir gráfico anterior si existe
     if (window.sentimentChart) {
         window.sentimentChart.destroy();
     }
@@ -149,32 +114,53 @@ const displayGraph = (resumen, year) => {
         type: 'bar',
         data: {
             labels: meses,
-            datasets: [{
-                label: 'Clasificación mensual',
-                data: valoresNumericos,
-                backgroundColor: clasificaciones.map(cl => colores[cl]),
-                borderColor: 'black',
-                borderWidth: 1
-            }]
+            datasets: [
+                {
+                    label: 'Positivas',
+                    data: positiveData,
+                    backgroundColor: 'green'
+                },
+                {
+                    label: 'Negativas',
+                    data: negativeData,
+                    backgroundColor: 'red'
+                },
+                {
+                    label: 'Mixtas',
+                    data: mixedData,
+                    backgroundColor: 'orange'
+                }
+            ]
         },
         options: {
+            responsive: true,
             scales: {
                 y: {
                     beginAtZero: true,
-                    max: 5,
+                    max: 1,
                     ticks: {
-                        stepSize: 1,
                         callback: function (value) {
-                            switch (value) {
-                                case 1: return 'Buena';
-                                case 2: return 'Mixta';
-                                case 3: return 'Neutral';
-                                case 4: return 'Mala';
-                                case 5: return 'Sin datos';
-                                default: return '';
-                            }
+                            return (value * 100).toFixed(0) + '%';
                         }
+                    },
+                    title: {
+                        display: true,
+                        text: 'Porcentaje'
                     }
+                }
+            },
+            plugins: {
+                tooltip: {
+                    callbacks: {
+                        label: ctx => `${ctx.dataset.label}: ${(ctx.raw * 100).toFixed(1)}%`
+                    }
+                },
+                legend: {
+                    position: 'top'
+                },
+                title: {
+                    display: true,
+                    text: `Promedio de sentimientos por mes - ${year}`
                 }
             }
         }
