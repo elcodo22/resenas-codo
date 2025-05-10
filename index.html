@@ -6,30 +6,26 @@
     <title>Gráfico de Promedio de Reseñas</title>
     <!-- Cargar Chart.js desde CDN -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- Vincular archivo de estilos -->
-    <link rel="stylesheet" href="styles.css">
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        table { border-collapse: collapse; width: 100%; margin-top: 20px; }
+        th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+        th { background-color: #f2f2f2; }
+        button { padding: 10px 20px; margin: 10px; background-color: #007bff; color: white; border: none; cursor: pointer; }
+        button:hover { background-color: #0056b3; }
+        canvas { width: 100%; height: 400px; }
+    </style>
 </head>
 <body>
+    <h1>Subir archivo CSV y ver gráfico de reseñas</h1>
 
-    <div class="container">
-        <h1>Promedio de Reseñas por Mes</h1>
+    <input type="file" id="csvFile" accept=".csv" />
+    <button onclick="uploadFile()">Subir CSV a S3</button>
+    <button onclick="cargarResumenDesdeDynamo()">Leer desde DynamoDB</button>
 
-        <!-- Formulario para cargar el archivo CSV -->
-        <div class="file-upload">
-            <input type="file" id="csvFile" accept=".csv">
-            <button onclick="uploadFile()">Subir CSV</button>
-        </div>
+    <!-- Contenedor para mostrar el gráfico -->
+    <canvas id="graficoResenas"></canvas>
 
-        <!-- Botón para cargar datos desde DynamoDB -->
-        <div class="button-container">
-            <button onclick="cargarResumenDesdeDynamo()">Cargar Resúmenes Mensuales desde DynamoDB</button>
-        </div>
-
-        <!-- Aquí se renderizará el gráfico -->
-        <canvas id="graficoResenas"></canvas>
-    </div>
-
-    <!-- Vincular archivo de JavaScript -->
-    <script src="app.js"></script>
+    <script src="app.js"></script> <!-- Cargar el archivo JavaScript separado -->
 </body>
 </html>
