@@ -28,30 +28,32 @@ const uploadFile = async () => {
 };
 
 const displayGraph = (resumen) => {
-    const labels = Object.keys(resumen);
-    const positiveData = labels.map(mes => resumen[mes].PromedioPositiva);
-    const negativeData = labels.map(mes => resumen[mes].PromedioNegativa);
+    const meses = Object.keys(resumen); // ['Enero', 'Febrero', ...]
+    const categorias = ['MuyPositiva', 'Media', 'Negativa'];
+
+    // Para cada categoría, obtenemos los valores en cada mes
+    const datasets = categorias.map((categoria, index) => {
+        const colores = ['green', 'orange', 'red'];
+        return {
+            label: categoria,
+            data: meses.map(mes => resumen[mes][categoria]),
+            backgroundColor: colores[index],
+        };
+    });
 
     const ctx = document.getElementById('sentimentChart').getContext('2d');
-    const chart = new Chart(ctx, {
-        type: 'line',
+
+    new Chart(ctx, {
+        type: 'bar',
         data: {
-            labels: labels,
-            datasets: [{
-                label: 'Sentimiento Positivo',
-                data: positiveData,
-                borderColor: 'green',
-                fill: false,
-            }, {
-                label: 'Sentimiento Negativo',
-                data: negativeData,
-                borderColor: 'red',
-                fill: false,
-            }]
+            labels: meses, // Meses en el eje Y
+            datasets: datasets // Categorías en eje X
         },
         options: {
+            indexAxis: 'y', // Hace que las barras sean horizontales
+            responsive: true,
             scales: {
-                y: {
+                x: {
                     beginAtZero: true
                 }
             }
