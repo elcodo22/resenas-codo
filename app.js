@@ -51,12 +51,24 @@ const cargarResumenDesdeDynamo = async () => {
 const renderGrafico = (resumenMensual) => {
     const ctx = document.getElementById('graficoResenas').getContext('2d');
 
-    // Obtenemos las claves de los meses (2024-01-01, 2024-02-01, etc.)
-    const meses = Object.keys(resumenMensual);
+    // Obtenemos las claves de los meses y las ordenamos
+    const mesesOrdenados = [
+        "2024-01-01", "2024-02-01", "2024-03-01", "2024-04-01", "2024-05-01", 
+        "2024-06-01", "2024-07-01", "2024-08-01", "2024-09-01", "2024-10-01", 
+        "2024-11-01", "2024-12-01"
+    ];
 
-    // Calculamos las medias de cada mes
-    const medias = meses.map(mes => {
+    // Creamos un array de etiquetas para los meses (en español)
+    const etiquetasMeses = ["ENERO", "FEBRERO", "MARZO", "ABRIL", "MAYO", "JUNIO", "JULIO", "AGOSTO", "SEPTIEMBRE", "OCTUBRE", "NOVIEMBRE", "DICIEMBRE"];
+
+    // Creamos el array de medias para cada mes
+    const medias = mesesOrdenados.map(mes => {
         const valores = resumenMensual[mes]; // Accedemos a los valores para ese mes
+
+        // Si no hay reseñas para ese mes, lo consideramos 0
+        if (!valores) {
+            return 0;
+        }
 
         // Obtenemos los valores de cada tipo de sentimiento
         const positivas = valores.positivas || 0;
@@ -77,7 +89,7 @@ const renderGrafico = (resumenMensual) => {
     new Chart(ctx, {
         type: 'bar', // Tipo de gráfico (barras)
         data: {
-            labels: meses, // Meses como etiquetas
+            labels: etiquetasMeses, // Meses como etiquetas
             datasets: [{
                 label: 'Reseñas por mes (media)',
                 data: medias, // Datos de las medias
@@ -114,4 +126,3 @@ const renderGrafico = (resumenMensual) => {
         }
     });
 };
-
