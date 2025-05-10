@@ -10,7 +10,6 @@ const uploadFile = async () => {
     formData.append('csv', file);
 
     try {
-        // Subir el archivo al backend
         const response = await fetch('http://35.177.116.70:3000/upload', {
             method: 'POST',
             body: formData,
@@ -28,33 +27,50 @@ const uploadFile = async () => {
 };
 
 const displayGraph = (resumen) => {
-    const meses = Object.keys(resumen); // ['Enero', 'Febrero', ...]
-    const categorias = ['MuyPositiva', 'Media', 'Negativa'];
+    const mesesOrdenados = [
+        'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
+        'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
+    ];
 
-    // Para cada categoría, obtenemos los valores en cada mes
-    const datasets = categorias.map((categoria, index) => {
-        const colores = ['green', 'orange', 'red'];
-        return {
-            label: categoria,
-            data: meses.map(mes => resumen[mes][categoria]),
-            backgroundColor: colores[index],
-        };
-    });
+    const meses = mesesOrdenados.filter(mes => resumen[mes]);
+
+    const dataMuyPositiva = meses.map(mes => resumen[mes].MuyPositiva);
+    const dataMedia = meses.map(mes => resumen[mes].Media);
+    const dataNegativa = meses.map(mes => resumen[mes].Negativa);
 
     const ctx = document.getElementById('sentimentChart').getContext('2d');
-
     new Chart(ctx, {
         type: 'bar',
         data: {
-            labels: meses, // Meses en el eje Y
-            datasets: datasets // Categorías en eje X
+            labels: meses,
+            datasets: [
+                {
+                    label: 'Muy Positiva',
+                    data: dataMuyPositiva,
+                    backgroundColor: 'green'
+                },
+                {
+                    label: 'Media',
+                    data: dataMedia,
+                    backgroundColor: 'orange'
+                },
+                {
+                    label: 'Negativa',
+                    data: dataNegativa,
+                    backgroundColor: 'red'
+                }
+            ]
         },
         options: {
-            indexAxis: 'y', // Hace que las barras sean horizontales
             responsive: true,
+            plugins: {
+                legend: { position: 'top' },
+                title: { display: true, text: 'Sentimiento por Mes' }
+            },
             scales: {
-                x: {
-                    beginAtZero: true
+                y: {
+                    beginAtZero: true,
+                    max: 1
                 }
             }
         }
