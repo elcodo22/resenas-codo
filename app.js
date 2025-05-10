@@ -66,110 +66,108 @@ const handleYearChange = () => {
     }
 };
 
-const displayGraph = (resumen, year) => {
-    // Filtramos los meses que corresponden al año seleccionado
-    const meses = Object.keys(resumen).filter(mes => mes.startsWith(year));  
-    console.log('Meses filtrados:', meses);  // <-- Verifica que los meses estén correctamente filtrados
+const uploadFile = async () => {
+    const fileInput = document.getElementById('csvFile');
+    const file = fileInput.files[0];
+    if (!file) {
+        alert('Por favor, selecciona un archivo CSV');
+        return;
+    }
 
-    const sentimientos = [];
+    const formData = new FormData();
+    formData.append('csv', file);
 
-    meses.forEach(mes => {
-        const promedioPositiva = resumen[mes].PromedioPositiva || 0;
-        const promedioNegativa = resumen[mes].PromedioNegativa || 0;
+    try {
+        const response = await fetch('http://35.177.116.70:3000/upload', {
+            method: 'POST',
+            body: formData,
+        });
+
+        const result = await response.json();
+        console.log(result); // Agregar esto para depuración
+
+        if (response.ok) {
+            displayGraph(result.resumen_mensual);
+        } else {
+            alert(result.mensaje);
+        }
+    } catch (error) {
+        alert('Error al subir el archivo');
+    }
+};
+
+const displayGraph = (resumen) => {
+    const meses = [
+        "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"
+    ];
+    
+    const clasificaciones = [];
+
+    // Para cada mes en el año, verificamos las reseñas y calculamos la clasificación
+    meses.forEach((mes, index) => {
+        const mesKey = `2024-${(index + 1).toString().padStart(2, '0')}`;
         
-        // Clasificación del mes según los promedios
-        let clasificacion = 'MALA';  // Por defecto es MALA
-        if (promedioPositiva > promedioNegativa) {
-            clasificacion = 'BUENA';
-        } else if (promedioPositiva === promedioNegativa) {
-            clasificacion = 'MEDIA';
+        let clasificacion = "Mala"; // Clasificación predeterminada si no hay reseñas
+        if (resumen[mesKey]) {
+            const promedioPositiva = resumen[mesKey].PromedioPositiva;
+            const promedioNegativa = resumen[mesKey].PromedioNegativa;
+
+            // Clasificación
+            if (promedioPositiva > 0.5) {
+                clasificacion = "Buena";
+            } else if (promedioPositiva >= 0.3) {
+                clasificacion = "Media";
+            }
         }
 
-        // Depuración: Verificar la clasificación de cada mes
-        console.log(`Mes: ${mes}, Positiva: ${promedioPositiva}, Negativa: ${promedioNegativa}, Clasificación: ${clasificacion}`);
-
-        sentimientos.push(clasificacion);
+        clasificaciones.push(clasificacion);
     });
 
-    // Asignación de colores para cada clasificación
+    // Definir los colores para cada clasificación
     const colores = {
-        'BUENA': 'green',
-        'MEDIA': 'gray',
-        'MALA': 'red'
+        "Buena": "green",
+        "Media": "yellow",
+        "Mala": "red"
     };
 
-    // Comprobar los datos que estamos pasando al gráfico
-    console.log('Sentimientos:', sentimientos);  // <-- Verificar los sentimientos que pasamos al gráfico
+    // Preparar los datos para las barras (representación numérica de las clasificaciones)
+    const datos = clasificaciones.map(clasificacion => {
+        if (clasificacion === "Buena") return 1;
+        if (clasificacion === "Media") return 2;
+        return 3;
+    });
 
-    // Configuración del gráfico de barras
     const ctx = document.getElementById('sentimentChart').getContext('2d');
     new Chart(ctx, {
         type: 'bar',
         data: {
-            labels: meses,  // Meses en el eje X
+            labels: meses, // Meses como etiquetas del eje X
             datasets: [{
-                label: 'Sentimiento',
-                data: sentimientos.map(sentimiento => {
-                    // Asignar un valor numérico a cada clasificación para el eje Y
-                    switch (sentimiento) {
-                        case 'BUENA': return 1;
-                        case 'MEDIA': return 0;
-                        case 'MALA': return -1;
-                        default: return 0;
-                    }
-                }),  // Convertir las clasificaciones a valores numéricos
-                backgroundColor: sentimientos.map(sentimiento => colores[sentimiento]),
-                borderColor: sentimientos.map(sentimiento => colores[sentimiento]),
+                label: 'Clasificación de Sentimientos',
+                data: datos, // Los datos calculados (1: Buena, 2: Media, 3: Mala)
+                backgroundColor: clasificaciones.map(clasificacion => colores[clasificacion]), // Colores para cada clasificación
+                borderColor: 'black',
                 borderWidth: 1
             }]
         },
         options: {
-            responsive: true,
-            indexAxis: 'x', // Mostrar barras verticales
+            indexAxis: 'x', // Muestra los meses en el eje X
             scales: {
-                x: {
-                    title: {
-                        display: true,
-                        text: 'Meses'  // Título para el eje X
-                    }
-                },
                 y: {
                     beginAtZero: true,
+                    max: 3, // El máximo es 3 porque tenemos 3 clasificaciones (Buena, Media, Mala)
+                    ticks: {
+                        stepSize: 1,
+                        callback: function(value) {
+                            if (value === 1) return 'Buena';
+                            if (value === 2) return 'Media';
+                            if (value === 3) return 'Mala';
+                            return value;
+                        }
+                    },
                     title: {
                         display: true,
-                        text: 'Clasificación Sentimiento'  // Título para el eje Y
-                    },
-                    ticks: {
-                        // Personalizar los ticks para que muestren 'BUENA', 'MEDIA', 'MALA'
-                        callback: function(value) {
-                            switch(value) {
-                                case 1: return 'BUENA';
-                                case 0: return 'MEDIA';
-                                case -1: return 'MALA';
-                                default: return value;
-                            }
-                        }
-                    },
-                    min: -1,  // Valor mínimo (MALA)
-                    max: 1,   // Valor máximo (BUENA)
-                    stepSize: 1
-                }
-            },
-            plugins: {
-                legend: {
-                    position: 'top',
-                },
-                tooltip: {
-                    callbacks: {
-                        label: function(tooltipItem) {
-                            // Muestra el valor de la clasificación (por ejemplo, BUENA, MEDIA, MALA)
-                            switch(tooltipItem.raw) {
-                                case 1: return 'Sentimiento: BUENA';
-                                case 0: return 'Sentimiento: MEDIA';
-                                case -1: return 'Sentimiento: MALA';
-                                default: return `Sentimiento: ${tooltipItem.raw}`;
-                            }
-                        }
+                        text: 'Clasificación'
                     }
                 }
             }
