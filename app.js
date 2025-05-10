@@ -29,16 +29,14 @@ const uploadFile = async () => {
 };
 
 const displayGraph = (resumen) => {
-    const mesesOrdenados = [
-        'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
-        'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
-    ];
+    const meses = Object.keys(resumen);
+    const positiva = [];
+    const negativa = [];
 
-    const meses = mesesOrdenados.filter(mes => resumen[mes]);
-
-    const dataMuyPositiva = meses.map(mes => resumen[mes].MuyPositiva);
-    const dataMedia = meses.map(mes => resumen[mes].Media);
-    const dataNegativa = meses.map(mes => resumen[mes].Negativa);
+    meses.forEach(mes => {
+        positiva.push(resumen[mes].PromedioPositiva || 0);
+        negativa.push(resumen[mes].PromedioNegativa || 0);
+    });
 
     const ctx = document.getElementById('sentimentChart').getContext('2d');
     new Chart(ctx, {
@@ -47,36 +45,25 @@ const displayGraph = (resumen) => {
             labels: meses,
             datasets: [
                 {
-                    label: 'Muy Positiva',
-                    data: dataMuyPositiva,
+                    label: 'Positiva',
+                    data: positiva,
                     backgroundColor: 'green'
                 },
                 {
-                    label: 'Media',
-                    data: dataMedia,
-                    backgroundColor: 'orange'
-                },
-                {
                     label: 'Negativa',
-                    data: dataNegativa,
+                    data: negativa,
                     backgroundColor: 'red'
                 }
             ]
         },
         options: {
-            responsive: true,
-            plugins: {
-                legend: { position: 'top' },
-                title: { display: true, text: 'Sentimiento por Mes' }
-            },
+            indexAxis: 'y', // muestra los meses en el eje Y
             scales: {
-                y: {
+                x: {
                     beginAtZero: true,
-                    max: 1
+                    max: 1 // las puntuaciones son entre 0 y 1
                 }
             }
         }
     });
-    
-    
 };
