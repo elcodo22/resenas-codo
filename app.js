@@ -50,12 +50,16 @@ const cargarResumenDesdeDynamo = async () => {
 };
 
 // Función para renderizar la gráfica usando Chart.js
+// Función para renderizar la gráfica usando Chart.js
 const renderGrafico = (resumenMensual) => {
     const ctx = document.getElementById('graficoResenas').getContext('2d');
 
-    // Extraemos los meses y las medias de la respuesta para el gráfico
-    const meses = resumenMensual.map(item => item.mes);
-    const medias = resumenMensual.map(item => item.media);
+    // Convertimos el objeto resumenMensual en un array de pares [mes, datos]
+    const meses = Object.keys(resumenMensual); // Esto obtiene todas las claves (meses)
+    const medias = meses.map(mes => {
+        const valores = resumenMensual[mes]; // Accedemos a los valores para ese mes
+        return valores.media; // Obtenemos la media para el mes
+    });
 
     // Creamos el gráfico
     new Chart(ctx, {
