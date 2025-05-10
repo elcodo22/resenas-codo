@@ -66,46 +66,17 @@ const handleYearChange = () => {
     }
 };
 
-const uploadFile = async () => {
-    const fileInput = document.getElementById('csvFile');
-    const file = fileInput.files[0];
-    if (!file) {
-        alert('Por favor, selecciona un archivo CSV');
-        return;
-    }
-
-    const formData = new FormData();
-    formData.append('csv', file);
-
-    try {
-        const response = await fetch('http://35.177.116.70:3000/upload', {
-            method: 'POST',
-            body: formData,
-        });
-
-        const result = await response.json();
-        console.log(result); // Agregar esto para depuración
-
-        if (response.ok) {
-            displayGraph(result.resumen_mensual);
-        } else {
-            alert(result.mensaje);
-        }
-    } catch (error) {
-        alert('Error al subir el archivo');
-    }
-};
-
-const displayGraph = (resumen) => {
+// Función para mostrar el gráfico
+const displayGraph = (resumen, selectedYear) => {
     const meses = [
         "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"
     ];
     
     const clasificaciones = [];
 
-    // Para cada mes en el año, verificamos las reseñas y calculamos la clasificación
+    // Para cada mes en el año seleccionado, verificamos las reseñas y calculamos la clasificación
     meses.forEach((mes, index) => {
-        const mesKey = `2024-${(index + 1).toString().padStart(2, '0')}`;
+        const mesKey = `${selectedYear}-${(index + 1).toString().padStart(2, '0')}`;
         
         let clasificacion = "Mala"; // Clasificación predeterminada si no hay reseñas
         if (resumen[mesKey]) {
@@ -174,4 +145,3 @@ const displayGraph = (resumen) => {
         }
     });
 };
-
