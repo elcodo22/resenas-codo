@@ -17,19 +17,27 @@ function processCSV(filePath) {
         const fecha = row['fecha'];
         const mes = fecha.substring(0, 7); // '2024-01'
         
-        // Parseamos el JSON en el campo 'puntuaciones'
-        const puntuaciones = JSON.parse(row['puntuaciones']);
-        
-        // Inicializamos las estructuras para cada mes
-        if (!data[mes]) {
-          data[mes] = { total: 0, positivo: 0, negativo: 0, mixto: 0 };
+        try {
+          // Parseamos el JSON en el campo 'puntuaciones'
+          const puntuaciones = JSON.parse(row['puntuaciones']);
+          
+          // Inicializamos las estructuras para cada mes
+          if (!data[mes]) {
+            data[mes] = { total: 0, positivo: 0, negativo: 0, mixto: 0 };
+          }
+          
+          // Sumamos los valores de cada sentimiento
+          const positivo = puntuaciones.Positive ? puntuaciones.Positive.N : 0;
+          const negativo = puntuaciones.Negative ? puntuaciones.Negative.N : 0;
+          const mixto = puntuaciones.Mixed ? puntuaciones.Mixed.N : 0;
+
+          data[mes].total += 1;
+          data[mes].positivo += positivo;
+          data[mes].negativo += negativo;
+          data[mes].mixto += mixto;
+        } catch (err) {
+          console.error('Error al procesar la fila:', row, err);
         }
-        
-        // Sumamos los valores de cada sentimiento
-        data[mes].total += 1;
-        data[mes].positivo += puntuaciones.Positive.N;
-        data[mes].negativo += puntuaciones.Negative.N;
-        data[mes].mixto += puntuaciones.Mixed.N;
       })
       .on('end', () => {
         resolve(data);
