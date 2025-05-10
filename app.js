@@ -11,7 +11,7 @@ const uploadFile = async () => {
 
     try {
         // Subir el archivo al backend
-        const response = await fetch('http://your-ec2-public-ip:3000/upload', {
+        const response = await fetch('http://35.177.116.70:3000/upload', {
             method: 'POST',
             body: formData,
         });
