@@ -3,25 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard de Reseñas</title>
+    <title>Gráfico de Promedio de Reseñas</title>
+    <!-- Cargar Chart.js desde CDN -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Vincular archivo de estilos -->
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <h1>Dashboard de Reseñas</h1>
 
-    <!-- Formulario para subir archivo CSV -->
-    <div>
-        <label for="csvFile">Selecciona un archivo CSV:</label>
-        <input type="file" id="csvFile" accept=".csv">
-        <button onclick="uploadFile()">Subir Archivo</button>
+    <div class="container">
+        <h1>Promedio de Reseñas por Mes</h1>
+
+        <!-- Aquí se renderizará el gráfico -->
+        <canvas id="graficoResenas"></canvas>
+
+        <!-- Botón para cargar datos desde DynamoDB -->
+        <div class="button-container">
+            <button onclick="cargarResumenDesdeDynamo()">Cargar Resúmenes Mensuales</button>
+        </div>
     </div>
 
-    <!-- Botón para cargar el resumen y generar la gráfica -->
-    <button onclick="cargarResumenDesdeDynamo()">Cargar Resumen y Generar Gráfica</button>
-
-    <!-- Canvas donde se dibujará la gráfica -->
-    <canvas id="graficoResenas" width="400" height="200"></canvas>
-
+    <!-- Vincular archivo de JavaScript -->
     <script src="app.js"></script>
 </body>
 </html>
