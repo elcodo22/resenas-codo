@@ -18,14 +18,12 @@ const uploadFile = async () => {
             body: formData,
         });
 
-        if (!response.ok) throw new Error('Error al subir el archivo');
-
         const result = await response.json();
 
         console.log("Respuesta del backend:", result);
 
-        if (Array.isArray(result)) {
-            procesarDatos(result);
+        if (result.resumen_mensual) {
+            procesarResumenMensual(result.resumen_mensual);
         } else {
             console.error("Formato inesperado:", result);
             alert('Error: los datos recibidos no son válidos.');
@@ -35,62 +33,28 @@ const uploadFile = async () => {
     }
 };
 
-const procesarDatos = (datos) => {
-    resumenMensualGlobal = {};
-
-    datos.forEach(entry => {
-        const fecha = new Date(entry.fecha);
-        const year = fecha.getFullYear();
-        const month = String(fecha.getMonth() + 1).padStart(2, '0');
-        const key = `${year}-${month}`;
-
-        const puntuaciones = JSON.parse(entry.puntuaciones);
-
-        const pos = parseFloat(puntuaciones.Positive.N);
-        const neg = parseFloat(puntuaciones.Negative.N);
-        const mix = parseFloat(puntuaciones.Mixed.N);
-
-        if (!resumenMensualGlobal[key]) {
-            resumenMensualGlobal[key] = {
-                count: 0,
-                sumPos: 0,
-                sumNeg: 0,
-                sumMix: 0
-            };
-        }
-
-        resumenMensualGlobal[key].count += 1;
-        resumenMensualGlobal[key].sumPos += pos;
-        resumenMensualGlobal[key].sumNeg += neg;
-        resumenMensualGlobal[key].sumMix += mix;
-    });
-
-    añosDisponibles = [...new Set(Object.keys(resumenMensualGlobal).map(m => m.split('-')[0]))];
+const procesarResumenMensual = (resumenMensual) => {
+    resumenMensualGlobal = resumenMensual;
+    añosDisponibles = [...new Set(Object.keys(resumenMensual).map(m => m.split('-')[0]))];
     fillYearSelector();
-    displayGraph(resumenMensualGlobal, añosDisponibles[0]);
+    displayGraph(resumenMensual, añosDisponibles[0]);
 };
 
 const fillYearSelector = () => {
     const yearSelector = document.getElementById('yearSelector');
-    yearSelector.innerHTML = '';
-
-    const defaultOption = document.createElement('option');
-    defaultOption.text = "Selecciona un año";
-    yearSelector.appendChild(defaultOption);
+    yearSelector.innerHTML = ''; // Limpiar opciones
 
     añosDisponibles.forEach(year => {
         const option = document.createElement('option');
         option.value = year;
-        option.text = year;
+        option.textContent = year;
         yearSelector.appendChild(option);
     });
 };
 
-const handleYearChange = () => {
+const cambiarAno = () => {
     const selectedYear = document.getElementById('yearSelector').value;
-    if (selectedYear !== "Selecciona un año") {
-        displayGraph(resumenMensualGlobal, selectedYear);
-    }
+    displayGraph(resumenMensualGlobal, selectedYear);
 };
 
 const displayGraph = (resumen, year) => {
@@ -101,21 +65,17 @@ const displayGraph = (resumen, year) => {
 
     const datosPositivos = [];
     const datosNegativos = [];
-    const datosMixtos = [];
 
     for (let i = 0; i < 12; i++) {
         const mesClave = `${year}-${String(i + 1).padStart(2, '0')}`;
         const datosMes = resumen[mesClave];
 
         if (datosMes) {
-            const total = datosMes.count;
-            datosPositivos.push(datosMes.sumPos / total);
-            datosNegativos.push(datosMes.sumNeg / total);
-            datosMixtos.push(datosMes.sumMix / total);
+            datosPositivos.push(datosMes.PromedioPositiva || 0);
+            datosNegativos.push(datosMes.PromedioNegativa || 0);
         } else {
             datosPositivos.push(0);
             datosNegativos.push(0);
-            datosMixtos.push(0);
         }
     }
 
@@ -130,19 +90,14 @@ const displayGraph = (resumen, year) => {
             labels: meses,
             datasets: [
                 {
-                    label: 'Positivo',
+                    label: 'Positiva',
                     data: datosPositivos,
                     backgroundColor: 'rgba(75, 192, 192, 0.7)'
                 },
                 {
-                    label: 'Negativo',
+                    label: 'Negativa',
                     data: datosNegativos,
                     backgroundColor: 'rgba(255, 99, 132, 0.7)'
-                },
-                {
-                    label: 'Mixto',
-                    data: datosMixtos,
-                    backgroundColor: 'rgba(255, 206, 86, 0.7)'
                 }
             ]
         },
