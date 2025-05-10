@@ -57,90 +57,74 @@ const cambiarAno = () => {
     displayGraph(resumenMensualGlobal, selectedYear);
 };
 
-// Función para asignar los valores "Mala", "Media", "Buena" dependiendo del valor
-const getSentimentLevel = (average) => {
-    if (average === null) return "Mixed";
-    if (average >= 0.66) return "Buena";
-    if (average >= 0.33) return "Media";
-    return "Mala";
-};
-
 const displayGraph = (resumen, year) => {
     const meses = [
         "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
         "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"
     ];
 
-    const datosSentimiento = [];
-    const etiquetas = [];
+    const sentimentScores = [];
 
-    // Recorrer los meses para calcular los datos del gráfico
     for (let i = 0; i < 12; i++) {
         const mesClave = `${year}-${String(i + 1).padStart(2, '0')}`;
         const datosMes = resumen[mesClave];
 
-        if (datosMes && datosMes.total > 0) {
-            // Calcular la media de la reseña positiva
-            const media = datosMes.PromedioPositiva; // Puedes usar el promedio entre positiva y negativa si prefieres
-            // Convertir la media al nivel cualitativo
-            datosSentimiento.push(media);
-        } else {
-            // Si no hay datos para el mes, asignamos "Mixed"
-            datosSentimiento.push(null);
-        }
+        if (datosMes && datosMes.reseñas) {
+            let totalSentimiento = 0;
+            let totalReseñas = datosMes.reseñas.length;
 
-        etiquetas.push(meses[i]);
+            // Calcular el sentimiento de cada reseña
+            datosMes.reseñas.forEach(reseña => {
+                const sentiment = reseña.sentimiento; // Se espera que cada reseña tenga un campo de sentimiento: "positiva", "negativa", o "mixta"
+                if (sentiment === 'positiva') {
+                    totalSentimiento += 1; // Añadir 1 por reseña positiva
+                } else if (sentiment === 'negativa') {
+                    totalSentimiento += 0; // Añadir 0 por reseña negativa
+                }
+            });
+
+            // Calcular el promedio del sentimiento del mes
+            const promedioSentimiento = totalSentimiento / totalReseñas;
+            sentimentScores.push(promedioSentimiento);
+        } else {
+            sentimentScores.push(0.5); // Si no hay reseñas, asignar el valor mixto (0.5)
+        }
     }
 
-    // Si hay un gráfico previamente cargado, lo destruimos
     if (window.sentimentChart instanceof Chart) {
         window.sentimentChart.destroy();
     }
 
     const ctx = document.getElementById('sentimentChart').getContext('2d');
     window.sentimentChart = new Chart(ctx, {
-        type: 'line', // Cambiar tipo de gráfico a línea
+        type: 'line',
         data: {
-            labels: etiquetas,
+            labels: meses,
             datasets: [{
                 label: 'Sentimiento Promedio',
-                data: datosSentimiento,
-                borderColor: 'rgba(75, 192, 192, 1)', // Línea de color
-                backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                fill: true,
-                tension: 0.4,
-                pointRadius: 6,
-                pointHoverRadius: 8,
-                pointStyle: 'circle'
+                data: sentimentScores,
+                borderColor: 'rgba(75, 192, 192, 1)',
+                fill: false,
+                tension: 0.1
             }]
         },
         options: {
             responsive: true,
             scales: {
                 y: {
-                    beginAtZero: true,
                     min: 0,
-                    max: 2,
-                    stepSize: 1,
+                    max: 1,
                     ticks: {
+                        stepSize: 0.1,
                         callback: function(value) {
-                            const levels = ["Mala", "Media", "Buena"];
-                            return levels[value] || "Mixed"; // Usamos los niveles de sentimiento
+                            if (value === 1) return 'Buena';
+                            if (value === 0) return 'Mala';
+                            return 'Mixta';
                         }
                     },
                     title: {
                         display: true,
-                        text: 'Nivel de Sentimiento'
-                    }
-                }
-            },
-            plugins: {
-                tooltip: {
-                    callbacks: {
-                        label: function(context) {
-                            const value = context.raw;
-                            return value === null ? "Mixed" : getSentimentLevel(value);
-                        }
+                        text: 'Sentimiento del Mes'
                     }
                 }
             }
