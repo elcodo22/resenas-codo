@@ -35,11 +35,11 @@ const cargarResumenDesdeDynamo = async () => {
         const response = await fetch('http://35.177.116.70:3000/leer-dynamo');
         const result = await response.json();
 
-        if (result.resumen_mensual) {
-            console.log("Resumen mensual recibido desde DynamoDB:", result.resumen_mensual);
-            mostrarGrafico(result.resumen_mensual);
+        if (result) {
+            console.log("Datos recibidos desde DynamoDB:", result);
+            mostrarGrafico(result); // Llamar a la función que genera el gráfico
         } else {
-            console.warn("No se encontró resumen_mensual en la respuesta.");
+            console.warn("No se encontró resumen en la respuesta.");
             alert("No se encontraron datos.");
         }
 
@@ -48,21 +48,42 @@ const cargarResumenDesdeDynamo = async () => {
     }
 };
 
-// Función para calcular el promedio ponderado y mostrar el gráfico
-const mostrarGrafico = (resumen) => {
+// Función para agrupar los datos por mes y calcular el promedio ponderado
+const procesarDatos = (data) => {
+    // Agrupar las reseñas por mes (por ejemplo, '2024-01')
+    const resumenMensual = {};
+
+    for (const fecha in data) {
+        const valores = data[fecha];
+        const mes = fecha.slice(0, 7);  // Extraemos solo el año-mes (por ejemplo, '2024-01')
+
+        if (!resumenMensual[mes]) {
+            resumenMensual[mes] = {
+                positivas: 0,
+                negativas: 0,
+                mixtas: 0,
+                totalReseñas: 0
+            };
+        }
+
+        resumenMensual[mes].positivas += valores.positivas;
+        resumenMensual[mes].negativas += valores.negativas;
+        resumenMensual[mes].mixtas += valores.mixtas;
+        resumenMensual[mes].totalReseñas += valores.totalReseñas;
+    }
+
+    // Calcular el promedio ponderado por mes
     const mesesOrdenados = [
         "2024-01", "2024-02", "2024-03", "2024-04", "2024-05", 
         "2024-06", "2024-07", "2024-08", "2024-09", "2024-10", 
         "2024-11", "2024-12"
     ];
-    const meses = ["ENERO", "FEBRERO", "MARZO", "ABRIL", "MAYO", "JUNIO", "JULIO", "AGOSTO", "SEPTIEMBRE", "OCTUBRE", "NOVIEMBRE", "DICIEMBRE"];
-
-    // Datos del gráfico
+    
     const datosPromedioMensual = mesesOrdenados.map(mes => {
-        const valores = resumen[mes];
-        if (!valores || valores.totalReseñas === 0) return 0;
+        const valores = resumenMensual[mes] || { positivas: 0, negativas: 0, mixtas: 0, totalReseñas: 0 };
+        
+        if (valores.totalReseñas === 0) return 0;  // Si no hay reseñas para este mes, devolvemos 0.
 
-        // Calcular el promedio ponderado
         const puntuacionPositivas = valores.positivas * 1;  // Positivas = 1
         const puntuacionMixtas = valores.mixtas * 0.5;     // Mixtas = 0.5
         const puntuacionNegativas = valores.negativas * 0;  // Negativas = 0
@@ -71,6 +92,16 @@ const mostrarGrafico = (resumen) => {
         const totalPonderado = puntuacionPositivas + puntuacionMixtas + puntuacionNegativas;
         return totalPonderado / valores.totalReseñas;
     });
+
+    return datosPromedioMensual;
+};
+
+// Función para crear el gráfico con los datos procesados
+const mostrarGrafico = (data) => {
+    const meses = ["ENERO", "FEBRERO", "MARZO", "ABRIL", "MAYO", "JUNIO", "JULIO", "AGOSTO", "SEPTIEMBRE", "OCTUBRE", "NOVIEMBRE", "DICIEMBRE"];
+    
+    // Procesamos los datos para obtener los promedios mensuales
+    const datosPromedioMensual = procesarDatos(data);
 
     // Crear el gráfico usando Chart.js
     const ctx = document.getElementById('graficoResenas').getContext('2d');
