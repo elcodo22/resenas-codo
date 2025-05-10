@@ -12,14 +12,12 @@
         <h1>Análisis de Sentimientos</h1>
         
         <!-- Selector de Año -->
-        <select id="yearSelector" onchange="handleYearChange()">
-            <!-- Aquí se llenarán los años dinámicamente -->
-        </select>
+        <select id="yearSelector" onchange="handleYearChange()"></select>
 
         <input type="file" id="csvFile" accept=".csv">
-        <button onclick="uploadFile().catch(error => console.error(error))">Subir Archivo</button>
+        <button onclick="uploadFile()">Subir Archivo</button>
 
-        <canvas id="sentimentChart" width="400" height="200"></canvas>
+        <canvas id="sentimentChart" width="600" height="300"></canvas>
     </div>
 
     <script src="app.js"></script>
