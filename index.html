@@ -13,4 +13,74 @@
 <body>
     <h1>Subir archivo CSV y leer datos desde DynamoDB</h1>
 
-    <input
+    <input type="file" id="csvFile" accept=".csv" />
+    <button onclick="uploadFile()">Subir CSV a S3</button>
+    <button onclick="cargarResumenDesdeDynamo()">Leer desde DynamoDB</button>
+
+    <div id="tablaResumen"></div>
+
+    <script>
+        const uploadFile = async () => {
+            const fileInput = document.getElementById('csvFile');
+            const file = fileInput.files[0];
+            if (!file) {
+                alert('Por favor, selecciona un archivo CSV');
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('csv', file);
+
+            try {
+                const response = await fetch('http://35.177.116.70:3000/upload', {
+                    method: 'POST',
+                    body: formData,
+                });
+
+                const result = await response.json();
+                console.log("Respuesta del backend (subida):", result);
+
+                if (result.mensaje) {
+                    alert(result.mensaje);
+                }
+
+            } catch (error) {
+                console.error('Error al subir el archivo:', error);
+                alert('Error al subir el archivo.');
+            }
+        };
+
+        const cargarResumenDesdeDynamo = async () => {
+            try {
+                const response = await fetch('http://35.177.116.70:3000/leer-dynamo');
+                const result = await response.json();
+
+                if (result.resumen_mensual) {
+                    console.log("Resumen mensual recibido desde DynamoDB:", result.resumen_mensual);
+                    mostrarTabla(result.resumen_mensual);
+                } else {
+                    console.warn("No se encontró resumen_mensual en la respuesta.");
+                    document.getElementById('tablaResumen').innerHTML = '<p>No se encontraron datos.</p>';
+                }
+
+            } catch (error) {
+                console.error('Error al recuperar los datos desde DynamoDB:', error);
+            }
+        };
+
+        const mostrarTabla = (resumen) => {
+            const contenedor = document.getElementById('tablaResumen');
+            let html = '<table><thead><tr><th>Mes</th><th>Reseñas</th></tr></thead><tbody>';
+
+            for (const mes in resumen) {
+                const datosMes = resumen[mes];
+                const totalReseñas = datosMes.reseñas?.length || 0;
+                html += `<tr><td>${mes}</td><td>${totalReseñas}</td></tr>`;
+            }
+
+            html += '</tbody></table>';
+            contenedor.innerHTML = html;
+        };
+    </script>
+</body>
+</html>
