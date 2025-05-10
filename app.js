@@ -30,7 +30,6 @@ const uploadFile = async () => {
     }
 };
 
-// Función para cargar los datos desde DynamoDB y generar la gráfica
 const cargarResumenDesdeDynamo = async () => {
     try {
         const response = await fetch('http://35.177.116.70:3000/leer-dynamo');
@@ -49,16 +48,29 @@ const cargarResumenDesdeDynamo = async () => {
     }
 };
 
-// Función para renderizar la gráfica usando Chart.js
-// Función para renderizar la gráfica usando Chart.js
 const renderGrafico = (resumenMensual) => {
     const ctx = document.getElementById('graficoResenas').getContext('2d');
 
-    // Convertimos el objeto resumenMensual en un array de pares [mes, datos]
-    const meses = Object.keys(resumenMensual); // Esto obtiene todas las claves (meses)
+    // Obtenemos las claves de los meses (2024-01-01, 2024-02-01, etc.)
+    const meses = Object.keys(resumenMensual);
+
+    // Calculamos las medias de cada mes
     const medias = meses.map(mes => {
         const valores = resumenMensual[mes]; // Accedemos a los valores para ese mes
-        return valores.media; // Obtenemos la media para el mes
+
+        // Obtenemos los valores de cada tipo de sentimiento
+        const positivas = valores.positivas || 0;
+        const mixtas = valores.mixtas || 0;
+        const negativas = valores.negativas || 0;
+        const totalReseñas = valores.totalReseñas || 1; // Aseguramos que no divida por 0
+
+        // Calculamos la media para ese mes:
+        const porcentajePositivas = (positivas / totalReseñas) * 1; // 1 para positivas
+        const porcentajeMixtas = (mixtas / totalReseñas) * 0.5; // 0.5 para mixtas
+        const porcentajeNegativas = (negativas / totalReseñas) * 0; // 0 para negativas
+
+        // Media final sumando las puntuaciones
+        return porcentajePositivas + porcentajeMixtas + porcentajeNegativas;
     });
 
     // Creamos el gráfico
@@ -102,3 +114,4 @@ const renderGrafico = (resumenMensual) => {
         }
     });
 };
+
