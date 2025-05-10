@@ -67,27 +67,30 @@ const handleYearChange = () => {
 };
 
 // Función para mostrar el gráfico
-const displayGraph = (resumen, selectedYear) => {
+const displayGraph = (resumen) => {
     const meses = [
         "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"
     ];
     
     const clasificaciones = [];
 
-    // Para cada mes en el año seleccionado, verificamos las reseñas y calculamos la clasificación
+    // Para cada mes en el año, verificamos las reseñas y calculamos la clasificación
     meses.forEach((mes, index) => {
-        const mesKey = `${selectedYear}-${(index + 1).toString().padStart(2, '0')}`;
-        
+        const mesKey = `2024-${(index + 1).toString().padStart(2, '0')}`;
+
         let clasificacion = "Mala"; // Clasificación predeterminada si no hay reseñas
         if (resumen[mesKey]) {
-            const promedioPositiva = resumen[mesKey].PromedioPositiva;
-            const promedioNegativa = resumen[mesKey].PromedioNegativa;
+            const { Positive, Negative, Neutral, Mixed } = resumen[mesKey];
 
-            // Clasificación
-            if (promedioPositiva > 0.5) {
+            // Clasificación basada en los valores de las categorías
+            if (Positive && parseFloat(Positive.N) > 0.5) {
                 clasificacion = "Buena";
-            } else if (promedioPositiva >= 0.3) {
-                clasificacion = "Media";
+            } else if (Negative && parseFloat(Negative.N) > 0.5) {
+                clasificacion = "Mala";
+            } else if (Neutral && parseFloat(Neutral.N) > 0.5) {
+                clasificacion = "Neutral";
+            } else if (Mixed && parseFloat(Mixed.N) > 0.5) {
+                clasificacion = "Mixta";
             }
         }
 
@@ -97,15 +100,17 @@ const displayGraph = (resumen, selectedYear) => {
     // Definir los colores para cada clasificación
     const colores = {
         "Buena": "green",
-        "Media": "yellow",
+        "Mixta": "orange",
+        "Neutral": "yellow",
         "Mala": "red"
     };
 
     // Preparar los datos para las barras (representación numérica de las clasificaciones)
     const datos = clasificaciones.map(clasificacion => {
         if (clasificacion === "Buena") return 1;
-        if (clasificacion === "Media") return 2;
-        return 3;
+        if (clasificacion === "Mixta") return 2;
+        if (clasificacion === "Neutral") return 3;
+        return 4; // Mala
     });
 
     const ctx = document.getElementById('sentimentChart').getContext('2d');
@@ -115,7 +120,7 @@ const displayGraph = (resumen, selectedYear) => {
             labels: meses, // Meses como etiquetas del eje X
             datasets: [{
                 label: 'Clasificación de Sentimientos',
-                data: datos, // Los datos calculados (1: Buena, 2: Media, 3: Mala)
+                data: datos, // Los datos calculados (1: Buena, 2: Mixta, 3: Neutral, 4: Mala)
                 backgroundColor: clasificaciones.map(clasificacion => colores[clasificacion]), // Colores para cada clasificación
                 borderColor: 'black',
                 borderWidth: 1
@@ -126,13 +131,14 @@ const displayGraph = (resumen, selectedYear) => {
             scales: {
                 y: {
                     beginAtZero: true,
-                    max: 3, // El máximo es 3 porque tenemos 3 clasificaciones (Buena, Media, Mala)
+                    max: 4, // El máximo es 4 porque tenemos 4 clasificaciones (Buena, Mixta, Neutral, Mala)
                     ticks: {
                         stepSize: 1,
                         callback: function(value) {
                             if (value === 1) return 'Buena';
-                            if (value === 2) return 'Media';
-                            if (value === 3) return 'Mala';
+                            if (value === 2) return 'Mixta';
+                            if (value === 3) return 'Neutral';
+                            if (value === 4) return 'Mala';
                             return value;
                         }
                     },
