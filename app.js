@@ -22,12 +22,13 @@ const uploadFile = async () => {
 
         console.log("Respuesta del backend:", result);
 
-        if (result.resumen_mensual) {
-            procesarResumenMensual(result.resumen_mensual);
+        if (result.mensaje) {
+            alert(result.mensaje); // Solo muestra confirmación
         } else {
             console.error("Formato inesperado:", result);
             alert('Error: los datos recibidos no son válidos.');
         }
+
     } catch (error) {
         alert('Error: ' + error.message);
     }
