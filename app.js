@@ -1,3 +1,4 @@
+// Función para subir el archivo CSV
 const uploadFile = async () => {
     const fileInput = document.getElementById('csvFile');
     const file = fileInput.files[0];
@@ -27,6 +28,8 @@ const uploadFile = async () => {
         alert('Error al subir el archivo.');
     }
 };
+
+// Función para cargar los resúmenes mensuales desde DynamoDB
 const cargarResumenDesdeDynamo = async () => {
     try {
         const response = await fetch('http://35.177.116.70:3000/leer-dynamo');
