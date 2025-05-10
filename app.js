@@ -26,6 +26,7 @@ const uploadFile = async () => {
         console.error('Error al subir el archivo:', error);
         alert('Error al subir el archivo.');
     }
+};
 
 const cargarResumenDesdeDynamo = async () => {
     try {
@@ -43,4 +44,3 @@ const cargarResumenDesdeDynamo = async () => {
         console.error('Error al recuperar los datos desde DynamoDB:', error);
     }
 };
-
