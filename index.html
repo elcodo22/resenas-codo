@@ -14,16 +14,22 @@
     <div class="container">
         <h1>Promedio de Reseñas por Mes</h1>
 
-        <!-- Aquí se renderizará el gráfico -->
-        <canvas id="graficoResenas"></canvas>
+        <!-- Formulario para cargar el archivo CSV -->
+        <div class="file-upload">
+            <input type="file" id="csvFile" accept=".csv">
+            <button onclick="uploadFile()">Subir CSV</button>
+        </div>
 
         <!-- Botón para cargar datos desde DynamoDB -->
         <div class="button-container">
-            <button onclick="cargarResumenDesdeDynamo()">Cargar Resúmenes Mensuales</button>
+            <button onclick="cargarResumenDesdeDynamo()">Cargar Resúmenes Mensuales desde DynamoDB</button>
         </div>
+
+        <!-- Aquí se renderizará el gráfico -->
+        <canvas id="graficoResenas"></canvas>
     </div>
 
     <!-- Vincular archivo de JavaScript -->
-    <script src="app.js"></script>
+    <script src="script.js"></script>
 </body>
 </html>
