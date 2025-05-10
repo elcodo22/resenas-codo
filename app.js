@@ -79,9 +79,10 @@ const displayGraph = (resumen, year) => {
         }
     }
 
-    if (window.sentimentChart) {
-        window.sentimentChart.destroy();
+    if (window.sentimentChart instanceof Chart) {
+    window.sentimentChart.destroy();
     }
+
 
     const ctx = document.getElementById('sentimentChart').getContext('2d');
     window.sentimentChart = new Chart(ctx, {
