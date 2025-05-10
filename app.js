@@ -23,8 +23,8 @@ const uploadFile = async () => {
 
         if (result.mensaje) {
             alert(result.mensaje); // Muestra confirmación de la subida
-            if (result.resumen_mensual) {  // Cambié el nombre aquí
-                procesarResumenMensual(result.resumen_mensual);  // Cambié el nombre aquí
+            if (result.resumen_mensual) {
+                procesarResumenMensual(result.resumen_mensual);  // Procesamos el resumen mensual
             } else {
                 console.error("No se recibieron los datos esperados.");
                 alert('Error: los datos recibidos no son válidos.');
@@ -68,7 +68,6 @@ const displayGraph = (resumen, year) => {
 
     const sentimentScores = [];
 
-    // Iterar sobre los meses para calcular el puntaje de sentimiento
     for (let i = 0; i < 12; i++) {
         const mesClave = `${year}-${String(i + 1).padStart(2, '0')}`;
         const datosMes = resumen[mesClave];
