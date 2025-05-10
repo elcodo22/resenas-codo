@@ -5,7 +5,7 @@ const uploadFile = async () => {
         alert('Por favor, selecciona un archivo CSV');
         return;
     }
-
+    
     const formData = new FormData();
     formData.append('csv', file);
 
@@ -16,6 +16,8 @@ const uploadFile = async () => {
         });
 
         const result = await response.json();
+        console.log(result); // <-- Agrega esto
+
         if (response.ok) {
             displayGraph(result.resumen_mensual);
         } else {
@@ -75,4 +77,6 @@ const displayGraph = (resumen) => {
             }
         }
     });
+    
+    
 };
