@@ -1,124 +1,153 @@
-// Importamos las librerías necesarias
-const fs = require('fs');
-const path = require('path');
-const csv = require('csv-parser');
-const { ChartJSNodeCanvas } = require('chartjs-node-canvas');
+let resumenMensualGlobal = {};  // Guardar todos los datos cargados
+let añosDisponibles = [];  // Guardar los años disponibles
 
-// Creamos una función para procesar el CSV
-function processCSV(filePath) {
-  return new Promise((resolve, reject) => {
-    const data = {};
-    
-    // Leemos el archivo CSV
-    fs.createReadStream(filePath)
-      .pipe(csv())
-      .on('data', (row) => {
-        // Extraemos el mes y año
-        const fecha = row['fecha'];
-        const mes = fecha.substring(0, 7); // '2024-01'
-        
-        // Parseamos el JSON en el campo 'puntuaciones'
-        const puntuaciones = JSON.parse(row['puntuaciones']);
-        
-        // Inicializamos las estructuras para cada mes
-        if (!data[mes]) {
-          data[mes] = { total: 0, positivo: 0, negativo: 0, mixto: 0 };
+const uploadFile = async () => {
+    const fileInput = document.getElementById('csvFile');
+    const file = fileInput.files[0];
+    if (!file) {
+        alert('Por favor, selecciona un archivo CSV');
+        return;
+    }
+
+    const formData = new FormData();
+    formData.append('csv', file);
+
+    try {
+        const response = await fetch('http://35.177.116.70:3000/upload', {
+            method: 'POST',
+            body: formData,
+        });
+
+        const result = await response.json();
+        console.log('Datos recibidos:', result); // <-- Agregar para depurar
+
+        if (response.ok) {
+            resumenMensualGlobal = result.resumen_mensual;
+            // Extraer los años disponibles
+            añosDisponibles = Object.keys(resumenMensualGlobal).map(mes => mes.split('-')[0]);
+            añosDisponibles = [...new Set(añosDisponibles)];  // Eliminar duplicados
+
+            // Llenar el selector de años
+            fillYearSelector();
+            // Mostrar el análisis del primer año disponible
+            displayGraph(resumenMensualGlobal, añosDisponibles[0]);
+        } else {
+            alert(result.mensaje);
         }
-        
-        // Sumamos los valores de cada sentimiento
-        data[mes].total += 1;
-        data[mes].positivo += puntuaciones.Positive.N;
-        data[mes].negativo += puntuaciones.Negative.N;
-        data[mes].mixto += puntuaciones.Mixed.N;
-      })
-      .on('end', () => {
-        resolve(data);
-      })
-      .on('error', (err) => {
-        reject(err);
-      });
-  });
-}
+    } catch (error) {
+        alert('Error al subir el archivo');
+    }
+};
 
-// Creamos la función para generar el gráfico
-async function generateChart(data) {
-  const chartJSNodeCanvas = new ChartJSNodeCanvas({ width: 800, height: 600 });
-  
-  const labels = Object.keys(data); // Meses
-  const positivo = labels.map(mes => data[mes].positivo / data[mes].total); // Promedio Positivo
-  const negativo = labels.map(mes => data[mes].negativo / data[mes].total); // Promedio Negativo
-  const mixto = labels.map(mes => data[mes].mixto / data[mes].total); // Promedio Mixto
+// Llenar el selector de años
+const fillYearSelector = () => {
+    const yearSelector = document.getElementById('yearSelector');
+    yearSelector.innerHTML = "";  // Limpiar cualquier opción previa
 
-  const configuration = {
-    type: 'line',
-    data: {
-      labels: labels, // Meses
-      datasets: [
-        {
-          label: 'Positivo',
-          borderColor: 'green',
-          backgroundColor: 'rgba(0, 255, 0, 0.1)',
-          data: positivo,
-          fill: true,
-        },
-        {
-          label: 'Negativo',
-          borderColor: 'red',
-          backgroundColor: 'rgba(255, 0, 0, 0.1)',
-          data: negativo,
-          fill: true,
-        },
-        {
-          label: 'Mixto',
-          borderColor: 'orange',
-          backgroundColor: 'rgba(255, 165, 0, 0.1)',
-          data: mixto,
-          fill: true,
-        },
-      ],
-    },
-    options: {
-      responsive: true,
-      plugins: {
-        title: {
-          display: true,
-          text: 'Sentimiento por Mes',
-        },
-      },
-      scales: {
-        x: {
-          title: {
-            display: true,
-            text: 'Mes',
-          },
-        },
-        y: {
-          title: {
-            display: true,
-            text: 'Promedio de Sentimiento',
-          },
-          ticks: {
-            beginAtZero: true,
-          },
-        },
-      },
-    },
-  };
+    // Agregar la opción "Selecciona un año"
+    const defaultOption = document.createElement('option');
+    defaultOption.text = "Selecciona un año";
+    yearSelector.add(defaultOption);
 
-  const imageBuffer = await chartJSNodeCanvas.renderToBuffer(configuration);
-  fs.writeFileSync('sentiment_chart.png', imageBuffer);
-  console.log('Gráfico generado como "sentiment_chart.png".');
-}
+    // Agregar los años disponibles al selector
+    añosDisponibles.forEach(year => {
+        const option = document.createElement('option');
+        option.value = year;
+        option.text = year;
+        yearSelector.add(option);
+    });
+};
 
-// Función principal para procesar los datos y generar la gráfica
-async function main() {
-  const filePath = path.join(__dirname, 'data.csv'); // Asegúrate de que el archivo CSV esté en la misma carpeta
-  try {
-    const sentimentData = await processCSV(filePath);
-    await generateChart(sentimentData);
-  } catch (error) {
-    console.error('Error al procesar el archivo CSV:', error);
-  }
-}
+// Filtrar y mostrar los datos según el año seleccionado
+const handleYearChange = () => {
+    const selectedYear = document.getElementById('yearSelector').value;
+    if (selectedYear !== "Selecciona un año") {
+        displayGraph(resumenMensualGlobal, selectedYear);
+    }
+};
 
-main();
+// Función para mostrar el gráfico
+const displayGraph = (resumen) => {
+    const meses = [
+        "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"
+    ];
+    
+    const clasificaciones = [];
+
+    // Para cada mes en el año, verificamos las reseñas y calculamos la clasificación
+    meses.forEach((mes, index) => {
+        const mesKey = `2024-${(index + 1).toString().padStart(2, '0')}`;
+
+        let clasificacion = "Mala"; // Clasificación predeterminada si no hay reseñas
+        if (resumen[mesKey]) {
+            const { Positive, Negative, Neutral, Mixed } = resumen[mesKey];
+
+            // Clasificación basada en los valores de las categorías
+            if (Positive && parseFloat(Positive.N) > 0.5) {
+                clasificacion = "Buena";
+            } else if (Negative && parseFloat(Negative.N) > 0.5) {
+                clasificacion = "Mala";
+            } else if (Neutral && parseFloat(Neutral.N) > 0.5) {
+                clasificacion = "Neutral";
+            } else if (Mixed && parseFloat(Mixed.N) > 0.5) {
+                clasificacion = "Mixta";
+            }
+        }
+
+        clasificaciones.push(clasificacion);
+    });
+
+    // Definir los colores para cada clasificación
+    const colores = {
+        "Buena": "green",
+        "Mixta": "orange",
+        "Neutral": "yellow",
+        "Mala": "red"
+    };
+
+    // Preparar los datos para las barras (representación numérica de las clasificaciones)
+    const datos = clasificaciones.map(clasificacion => {
+        if (clasificacion === "Buena") return 1;
+        if (clasificacion === "Mixta") return 2;
+        if (clasificacion === "Neutral") return 3;
+        return 4; // Mala
+    });
+
+    const ctx = document.getElementById('sentimentChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: meses, // Meses como etiquetas del eje X
+            datasets: [{
+                label: 'Clasificación de Sentimientos',
+                data: datos, // Los datos calculados (1: Buena, 2: Mixta, 3: Neutral, 4: Mala)
+                backgroundColor: clasificaciones.map(clasificacion => colores[clasificacion]), // Colores para cada clasificación
+                borderColor: 'black',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            indexAxis: 'x', // Muestra los meses en el eje X
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    max: 4, // El máximo es 4 porque tenemos 4 clasificaciones (Buena, Mixta, Neutral, Mala)
+                    ticks: {
+                        stepSize: 1,
+                        callback: function(value) {
+                            if (value === 1) return 'Buena';
+                            if (value === 2) return 'Mixta';
+                            if (value === 3) return 'Neutral';
+                            if (value === 4) return 'Mala';
+                            return value;
+                        }
+                    },
+                    title: {
+                        display: true,
+                        text: 'Clasificación'
+                    }
+                }
+            }
+        }
+    });
+};
