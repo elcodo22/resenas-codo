@@ -17,7 +17,7 @@
         </select>
 
         <input type="file" id="csvFile" accept=".csv">
-        <button onclick="uploadFile()">Subir Archivo</button>
+        <button onclick="uploadFile().catch(error => console.error(error))">Subir Archivo</button>
 
         <canvas id="sentimentChart" width="400" height="200"></canvas>
     </div>
