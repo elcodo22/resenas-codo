@@ -1,86 +1,24 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <title>Subida y Lectura de CSV</title>
-    <style>
-        body { font-family: Arial, sans-serif; padding: 20px; }
-        table { border-collapse: collapse; width: 100%; margin-top: 20px; }
-        th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
-        th { background-color: #f2f2f2; }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gráfica de Sentimientos de Reseñas</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-    <h1>Subir archivo CSV y leer datos desde DynamoDB</h1>
+  <h1>Gráfica de Sentimientos de Reseñas</h1>
 
-    <input type="file" id="csvFile" accept=".csv" />
-    <button onclick="uploadFile()">Subir CSV a S3</button>
-    <button onclick="cargarResumenDesdeDynamo()">Leer desde DynamoDB</button>
+  <!-- Formulario de carga de archivo CSV -->
+  <form id="csvForm" enctype="multipart/form-data">
+    <input type="file" id="csvFile" name="csv" accept=".csv" required />
+    <button type="submit">Subir Archivo</button>
+  </form>
 
-    <div id="tablaResumen"></div>
+  <br>
 
-    <script>
-        const uploadFile = async () => {
-            const fileInput = document.getElementById('csvFile');
-            const file = fileInput.files[0];
-            if (!file) {
-                alert('Por favor, selecciona un archivo CSV');
-                return;
-            }
+  <canvas id="sentimientosChart" width="800" height="400"></canvas>
 
-            const formData = new FormData();
-            formData.append('csv', file);
-
-            try {
-                const response = await fetch('http://35.177.116.70:3000/upload', {
-                    method: 'POST',
-                    body: formData,
-                });
-
-                const result = await response.json();
-                console.log("Respuesta del backend (subida):", result);
-
-                if (result.mensaje) {
-                    alert(result.mensaje);
-                }
-
-            } catch (error) {
-                console.error('Error al subir el archivo:', error);
-                alert('Error al subir el archivo.');
-            }
-        };
-
-        const cargarResumenDesdeDynamo = async () => {
-            try {
-                const response = await fetch('http://35.177.116.70:3000/leer-dynamo');
-                const result = await response.json();
-
-                if (result.resumen_mensual) {
-                    console.log("Resumen mensual recibido desde DynamoDB:", result.resumen_mensual);
-                    mostrarTabla(result.resumen_mensual);
-                } else {
-                    console.warn("No se encontró resumen_mensual en la respuesta.");
-                    document.getElementById('tablaResumen').innerHTML = '<p>No se encontraron datos.</p>';
-                }
-
-            } catch (error) {
-                console.error('Error al recuperar los datos desde DynamoDB:', error);
-            }
-        };
-
-        const mostrarTabla = (resumen) => {
-            const contenedor = document.getElementById('tablaResumen');
-            let html = '<table><thead><tr><th>Mes</th><th>Reseñas</th></tr></thead><tbody>';
-
-            for (const mes in resumen) {
-                const datosMes = resumen[mes];
-                const totalReseñas = datosMes.reseñas?.length || 0;
-                html += `<tr><td>${mes}</td><td>${totalReseñas}</td></tr>`;
-            }
-
-            html += '</tbody></table>';
-            contenedor.innerHTML = html;
-        };
-    </script>
+  <script src="app.js"></script>
 </body>
 </html>
