@@ -63,54 +63,78 @@ const displayGraph = (resumen, year) => {
         "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"
     ];
 
-    const datosPositivos = [];
-    const datosNegativos = [];
+    const datosSentimiento = [];
+    const etiquetas = [];
 
+    // Recorrer los meses para calcular los datos del gráfico
     for (let i = 0; i < 12; i++) {
         const mesClave = `${year}-${String(i + 1).padStart(2, '0')}`;
         const datosMes = resumen[mesClave];
 
-        if (datosMes) {
-            datosPositivos.push(datosMes.PromedioPositiva || 0);
-            datosNegativos.push(datosMes.PromedioNegativa || 0);
+        if (datosMes && datosMes.total > 0) {
+            // Calcular la media de la reseña positiva, tomando el promedio de la reseña positiva y negativa
+            const media = (datosMes.PromedioPositiva + datosMes.PromedioNegativa) / 2;
+            // Agregar la media al array de datos
+            datosSentimiento.push(media);
         } else {
-            datosPositivos.push(0);
-            datosNegativos.push(0);
+            // Si no hay reseñas, asignar el valor "Mixed" con valor 0.5
+            datosSentimiento.push(0.5);
         }
+
+        etiquetas.push(meses[i]);
     }
 
+    // Si hay un gráfico previamente cargado, lo destruimos
     if (window.sentimentChart instanceof Chart) {
-    window.sentimentChart.destroy();
+        window.sentimentChart.destroy();
     }
-
 
     const ctx = document.getElementById('sentimentChart').getContext('2d');
     window.sentimentChart = new Chart(ctx, {
-        type: 'bar',
+        type: 'line', // Cambiar tipo de gráfico a línea
         data: {
-            labels: meses,
-            datasets: [
-                {
-                    label: 'Positiva',
-                    data: datosPositivos,
-                    backgroundColor: 'rgba(75, 192, 192, 0.7)'
-                },
-                {
-                    label: 'Negativa',
-                    data: datosNegativos,
-                    backgroundColor: 'rgba(255, 99, 132, 0.7)'
-                }
-            ]
+            labels: etiquetas,
+            datasets: [{
+                label: 'Sentimiento Promedio',
+                data: datosSentimiento,
+                borderColor: 'rgba(75, 192, 192, 1)', // Línea de color
+                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                fill: true,
+                tension: 0.4,
+                pointRadius: 6,
+                pointHoverRadius: 8,
+                pointStyle: 'circle'
+            }]
         },
         options: {
             responsive: true,
             scales: {
                 y: {
-                    beginAtZero: true,
-                    max: 1,
+                    min: 0, // Empieza en 0
+                    max: 1, // Termina en 1
+                    stepSize: 0.1, // Intervalo de 0.1 para los valores
+                    ticks: {
+                        callback: function(value) {
+                            if (value === 0) return 'Mala';
+                            if (value === 0.5) return 'Mixta';
+                            if (value === 1) return 'Buena';
+                            return ''; // Para valores entre 0 y 1, no mostramos etiquetas adicionales
+                        }
+                    },
                     title: {
-                        display: true,
-                        text: 'Media del Sentimiento'
+                        display: false // No mostramos título en el eje Y
+                    }
+                }
+            },
+            plugins: {
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            const value = context.raw;
+                            if (value === 0.5) return "Mixta";
+                            if (value < 0.5) return "Mala";
+                            return "Buena";
+                        }
                     }
                 }
             }
