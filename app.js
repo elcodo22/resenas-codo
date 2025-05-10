@@ -4,6 +4,7 @@ const fs = require('fs');
 const cors = require('cors');
 const { S3Client, PutObjectCommand } = require('@aws-sdk/client-s3');
 const { DynamoDBClient, ScanCommand } = require('@aws-sdk/client-dynamodb');
+const path = require('path');
 
 const app = express();
 const port = 3000;
