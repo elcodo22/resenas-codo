@@ -72,6 +72,9 @@ const procesarDatos = (data) => {
         resumenMensual[mes].totalReseñas += valores.totalReseñas;
     }
 
+    // Imprimir en consola para verificar si estamos agrupando correctamente
+    console.log('Resumen mensual agrupado:', resumenMensual);
+
     // Calcular el promedio ponderado por mes
     const mesesOrdenados = [
         "2024-01", "2024-02", "2024-03", "2024-04", "2024-05", 
@@ -81,7 +84,10 @@ const procesarDatos = (data) => {
     
     const datosPromedioMensual = mesesOrdenados.map(mes => {
         const valores = resumenMensual[mes] || { positivas: 0, negativas: 0, mixtas: 0, totalReseñas: 0 };
-        
+
+        // Mostrar los valores para cada mes antes de calcular el promedio ponderado
+        console.log(`Datos para el mes ${mes}:`, valores);
+
         if (valores.totalReseñas === 0) return 0;  // Si no hay reseñas para este mes, devolvemos 0.
 
         const puntuacionPositivas = valores.positivas * 1;  // Positivas = 1
@@ -90,7 +96,12 @@ const procesarDatos = (data) => {
 
         // Promedio ponderado
         const totalPonderado = puntuacionPositivas + puntuacionMixtas + puntuacionNegativas;
-        return totalPonderado / valores.totalReseñas;
+        const promedio = totalPonderado / valores.totalReseñas;
+
+        // Mostrar el resultado del promedio para cada mes
+        console.log(`Promedio para ${mes}:`, promedio);
+
+        return promedio;
     });
 
     return datosPromedioMensual;
@@ -102,6 +113,9 @@ const mostrarGrafico = (data) => {
     
     // Procesamos los datos para obtener los promedios mensuales
     const datosPromedioMensual = procesarDatos(data);
+
+    // Verificar los datos procesados antes de graficar
+    console.log("Datos procesados para el gráfico:", datosPromedioMensual);
 
     // Crear el gráfico usando Chart.js
     const ctx = document.getElementById('graficoResenas').getContext('2d');
