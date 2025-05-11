@@ -1,7 +1,7 @@
 /* Estilos generales de la página */
 body {
-    font-family: 'Arial', sans-serif;
-    background-color: #f4f4f9;
+    font-family: 'Roboto', sans-serif;
+    background-color: #f3f4f6;
     margin: 0;
     padding: 0;
     display: flex;
@@ -14,98 +14,129 @@ body {
 /* Contenedor principal */
 .container {
     width: 80%;
-    max-width: 1200px;
-    margin-top: 20px;
+    max-width: 1100px;
     text-align: center;
+    padding: 20px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, #6e7dff, #4e4bff);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
 }
 
 /* Título */
 h1 {
-    font-size: 2.5em;
-    color: #333;
-    margin-bottom: 20px;
-    font-weight: 600;
+    font-size: 2.8em;
+    color: white;
+    margin-bottom: 25px;
+    font-weight: 700;
+    text-shadow: 1px 1px 5px rgba(0, 0, 0, 0.2);
 }
 
 /* Formulario */
 .form-container {
     background-color: #fff;
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 15px 25px rgba(0, 0, 0, 0.1);
     width: 100%;
-    margin-bottom: 30px;
+    margin-bottom: 25px;
 }
 
 .form-container label {
     font-size: 1.1em;
-    color: #555;
+    color: #444;
 }
 
 .form-container input[type="file"],
 .form-container select {
     width: 100%;
-    padding: 10px;
-    margin-top: 10px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
+    padding: 12px;
+    margin-top: 12px;
+    border: 2px solid #d3d4d9;
+    border-radius: 8px;
     background-color: #f9f9f9;
     font-size: 1em;
+    color: #333;
+    box-sizing: border-box;
+    transition: all 0.3s ease;
 }
 
-.form-container input[type="file"] {
-    font-size: 0.9em;
+.form-container input[type="file"]:hover,
+.form-container select:hover {
+    border-color: #6e7dff;
+    background-color: #fafafa;
+}
+
+.form-container input[type="file"]:focus,
+.form-container select:focus {
+    outline: none;
+    border-color: #4e4bff;
+    box-shadow: 0 0 5px rgba(79, 75, 255, 0.5);
 }
 
 /* Botón de carga */
 .form-container button {
-    background-color: #4CAF50;
+    background-color: #6e7dff;
     color: white;
-    padding: 12px 20px;
+    padding: 12px 25px;
     margin-top: 20px;
     border: none;
-    border-radius: 5px;
-    font-size: 1.1em;
+    border-radius: 50px;
+    font-size: 1.2em;
     cursor: pointer;
-    transition: background-color 0.3s;
+    transition: all 0.3s ease;
+    width: 100%;
 }
 
 .form-container button:hover {
-    background-color: #45a049;
+    background-color: #4e4bff;
+    transform: translateY(-3px);
+}
+
+/* Selector de Año */
+.year-selector {
+    margin: 20px 0;
+    font-size: 1.3em;
+    padding: 12px 20px;
+    background-color: #ffffff;
+    border: 2px solid #d3d4d9;
+    border-radius: 8px;
+    box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+}
+
+.year-selector select {
+    padding: 12px;
+    width: 200px;
+    border-radius: 8px;
+    border: 2px solid #ddd;
+    font-size: 1em;
+    color: #333;
+    box-sizing: border-box;
+    transition: all 0.3s ease;
+}
+
+.year-selector select:hover {
+    border-color: #6e7dff;
+}
+
+.year-selector select:focus {
+    outline: none;
+    border-color: #4e4bff;
+    box-shadow: 0 0 5px rgba(79, 75, 255, 0.5);
+}
+
+.year-selector label {
+    margin-right: 15px;
+    color: #333;
+    font-weight: 600;
 }
 
 /* Gráfico */
 #graficoResenas {
     max-width: 100%;
     margin-top: 30px;
-    border: 2px solid #ddd;
-    border-radius: 10px;
-    background-color: #fff;
-}
-
-/* Selector de Año */
-.year-selector {
-    margin: 20px 0;
-    font-size: 1.2em;
-    padding: 10px 20px;
-    background-color: #ffffff;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
-}
-
-.year-selector select {
-    padding: 10px;
-    width: 200px;
-    border-radius: 5px;
-    border: 1px solid #ddd;
-    font-size: 1em;
-}
-
-.year-selector label {
-    margin-right: 10px;
-    color: #555;
-    font-weight: 600;
+    border-radius: 12px;
+    background-color: white;
+    box-shadow: 0 15px 25px rgba(0, 0, 0, 0.1);
 }
 
 /* Estilo para la alerta */
@@ -114,8 +145,9 @@ h1 {
     color: white;
     padding: 15px;
     margin-bottom: 20px;
-    border-radius: 5px;
+    border-radius: 10px;
     font-size: 1.1em;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
 .alert-success {
@@ -129,16 +161,36 @@ h1 {
     }
 
     .form-container {
-        padding: 15px;
+        padding: 20px;
     }
 
     h1 {
-        font-size: 2em;
+        font-size: 2.2em;
     }
 
     .form-container button {
-        padding: 10px 15px;
+        padding: 12px 20px;
+        font-size: 1.1em;
+    }
+
+    .year-selector select {
+        width: 180px;
+    }
+}
+
+@media (max-width: 480px) {
+    h1 {
+        font-size: 1.8em;
+    }
+
+    .form-container button {
+        padding: 12px;
         font-size: 1em;
+    }
+
+    .form-container input[type="file"],
+    .form-container select {
+        padding: 10px;
     }
 
     .year-selector select {
