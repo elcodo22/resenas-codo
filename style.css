@@ -1,7 +1,7 @@
 /* Estilos generales */
 body {
-    font-family: 'Arial', sans-serif;
-    background-color: #f8f9fa;
+    font-family: 'Roboto', sans-serif;
+    background-color: #f4f6f9;
     margin: 0;
     padding: 0;
     display: flex;
@@ -13,49 +13,59 @@ body {
 
 /* Contenedor principal */
 .container {
-    width: 80%;
-    max-width: 1000px;
+    width: 85%;
+    max-width: 900px;
     text-align: center;
-    padding: 30px;
+    padding: 40px;
     background-color: #fff;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    border-radius: 8px;
+    border-radius: 12px;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s ease;
+}
+
+.container:hover {
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
 }
 
 /* Título */
 h1 {
-    font-size: 2.5em;
-    color: #343a40;
+    font-size: 2.8em;
+    color: #333;
     margin-bottom: 30px;
-    font-weight: 700;
+    font-weight: 600;
+    letter-spacing: -1px;
 }
 
 /* Formulario */
 .form-container {
-    padding: 25px;
+    padding: 30px;
     background-color: #fff;
-    border-radius: 8px;
-    box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+    border-radius: 12px;
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.07);
 }
 
 .form-container label {
-    font-size: 1.1em;
+    font-size: 1.15em;
     color: #495057;
+    margin-bottom: 8px;
+    display: block;
+    font-weight: 500;
 }
 
 /* Campos de entrada */
 .form-container input[type="file"],
 .form-container select {
     width: 100%;
-    padding: 12px;
-    margin-top: 12px;
-    border: 1px solid #ced4da;
-    border-radius: 4px;
-    background-color: #f1f3f5;
-    font-size: 1em;
+    padding: 14px;
+    margin-top: 10px;
+    border: 2px solid #ccc;
+    border-radius: 6px;
+    background-color: #fafbfc;
+    font-size: 1.05em;
     color: #495057;
     box-sizing: border-box;
-    transition: border-color 0.3s ease;
+    transition: all 0.3s ease;
+    outline: none;
 }
 
 .form-container input[type="file"]:hover,
@@ -65,54 +75,55 @@ h1 {
 
 .form-container input[type="file"]:focus,
 .form-container select:focus {
-    outline: none;
     border-color: #0056b3;
-    box-shadow: 0 0 5px rgba(0, 0, 255, 0.4);
+    box-shadow: 0 0 8px rgba(0, 123, 255, 0.4);
 }
 
-/* Botón de carga (Estilo Bootstrap) */
+/* Botón de carga (Estilo moderno) */
 .form-container button {
-    background-color: #007bff; /* Botón azul estilo Bootstrap */
+    background: linear-gradient(45deg, #007bff, #0056b3); /* Botón azul degradado */
     color: white;
-    padding: 12px 25px;
+    padding: 14px 25px;
     margin-top: 20px;
     border: none;
-    border-radius: 4px;
-    font-size: 1.1em;
+    border-radius: 8px;
+    font-size: 1.15em;
     cursor: pointer;
-    transition: background-color 0.3s ease, transform 0.2s ease;
+    transition: all 0.3s ease;
     width: 100%;
+    box-shadow: 0 4px 10px rgba(0, 123, 255, 0.1);
 }
 
 .form-container button:hover {
-    background-color: #0056b3; /* Fondo más oscuro al hacer hover */
+    background: linear-gradient(45deg, #0056b3, #004085);
     transform: translateY(-3px);
 }
 
 .form-container button:active {
-    background-color: #004085; /* Fondo más oscuro al hacer clic */
+    background: linear-gradient(45deg, #004085, #003366);
+    transform: translateY(1px);
 }
 
 /* Selector de Año */
 .year-selector {
     margin: 20px 0;
     font-size: 1.1em;
-    padding: 12px;
+    padding: 14px;
     background-color: #fff;
-    border: 1px solid #ced4da;
-    border-radius: 4px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    border: 2px solid #ced4da;
+    border-radius: 6px;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.08);
 }
 
 .year-selector select {
     padding: 12px;
-    width: 220px;
-    border-radius: 4px;
+    width: 240px;
+    border-radius: 6px;
     border: 1px solid #ced4da;
     font-size: 1em;
     color: #495057;
     box-sizing: border-box;
-    transition: border-color 0.3s ease;
+    transition: all 0.3s ease;
 }
 
 .year-selector select:hover {
@@ -122,34 +133,35 @@ h1 {
 .year-selector select:focus {
     outline: none;
     border-color: #0056b3;
-    box-shadow: 0 0 5px rgba(0, 0, 255, 0.4);
+    box-shadow: 0 0 6px rgba(0, 123, 255, 0.4);
 }
 
 .year-selector label {
-    margin-right: 15px;
+    margin-bottom: 10px;
     color: #495057;
     font-weight: 600;
+    display: block;
 }
 
 /* Gráfico */
 #graficoResenas {
     width: 100%;
-    margin-top: 30px;
+    margin-top: 40px;
     height: 400px;
-    border-radius: 8px;
-    background-color: white;
-    box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+    border-radius: 12px;
+    background-color: #fff;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.07);
 }
 
 /* Alertas */
 .alert {
     background-color: #e74c3c;
     color: white;
-    padding: 15px;
+    padding: 18px;
     margin-bottom: 20px;
     border-radius: 8px;
-    font-size: 1em;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    font-size: 1.1em;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
 }
 
 .alert-success {
@@ -160,14 +172,15 @@ h1 {
 @media (max-width: 768px) {
     .container {
         width: 90%;
+        padding: 30px;
     }
 
     .form-container {
-        padding: 20px;
+        padding: 25px;
     }
 
     h1 {
-        font-size: 2em;
+        font-size: 2.2em;
     }
 
     .form-container button {
@@ -176,13 +189,13 @@ h1 {
     }
 
     .year-selector select {
-        width: 180px;
+        width: 200px;
     }
 }
 
 @media (max-width: 480px) {
     h1 {
-        font-size: 1.5em;
+        font-size: 1.7em;
     }
 
     .form-container button {
@@ -196,6 +209,6 @@ h1 {
     }
 
     .year-selector select {
-        width: 150px;
+        width: 170px;
     }
 }
