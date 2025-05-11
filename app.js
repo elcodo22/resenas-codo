@@ -49,40 +49,8 @@ const cargarResumenDesdeDynamo = async () => {
 };
 
 // Función para agrupar los datos por mes y calcular el promedio ponderado
+// Función para agrupar los datos por mes y calcular el promedio ponderado
 const procesarDatos = (data) => {
-    // Agrupar las reseñas por mes (por ejemplo, '2024-01')
-    const resumenMensual = {};
-
-    for (const fecha in data) {
-        const valores = data[fecha];
-        const mes = fecha.slice(0, 7);  // Extraemos solo el año-mes (por ejemplo, '2024-01')
-
-        if (!resumenMensual[mes]) {
-            resumenMensual[mes] = {
-                positivas: 0,
-                negativas: 0,
-                mixtas: 0,
-                totalReseñas: 0
-            };
-        }
-
-        resumenMensual[mes].positivas += valores.positivas;
-        resumenMensual[mes].negativas += valores.negativas;
-        resumenMensual[mes].mixtas += valores.mixtas;
-        resumenMensual[mes].totalReseñas += valores.totalReseñas;
-    }
-
-    // Imprimir en consola para verificar si estamos agrupando correctamente
-    console.log('Resumen mensual agrupado:', resumenMensual);
-
-    // Calcular el promedio ponderado por mes
-    const mesesOrdenados = [
-        "2024-01", "2024-02", "2024-03", "2024-04", "2024-05", 
-        "2024-06", "2024-07", "2024-08", "2024-09", "2024-10", 
-        "2024-11", "2024-12"
-    ];
-    
-    const procesarDatos = (data) => {
     const resumenMensual = {};
 
     for (const fechaCompleta in data) {
@@ -133,6 +101,7 @@ const procesarDatos = (data) => {
 
     return datosPromedioMensual;
 };
+
 
 
 // Función para crear el gráfico con los datos procesados
