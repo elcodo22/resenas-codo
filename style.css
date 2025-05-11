@@ -89,51 +89,10 @@ select:focus {
 /* Grupo de botones */
 .button-group {
     display: flex;
-    gap: 20px;
-    flex-wrap: wrap;
     justify-content: center;
     margin-top: 30px;
 }
 
-/* Botones individuales */
+/* Botón único */
 button {
     background: linear-gradient(45deg, #007bff, #0056b3);
-    color: white;
-    padding: 14px 25px;
-    border: none;
-    border-radius: 8px;
-    font-size: 1.15em;
-    cursor: pointer;
-    min-width: 160px;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 12px rgba(0, 123, 255, 0.1);
-}
-
-button:hover {
-    background: linear-gradient(45deg, #0056b3, #004085);
-    transform: translateY(-4px);
-}
-
-button:active {
-    background: linear-gradient(45deg, #004085, #003366);
-    transform: translateY(2px);
-}
-
-#graficoResenas {
-    width: 100%;
-    margin-top: 30px;
-    height: 400px;
-    border-radius: 12px;
-    background-color: #fff;
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.07);
-}
-
-.alert {
-    background-color: #e74c3c;
-    color: white;
-    padding: 18px;
-    margin-bottom: 20px;
-    border-radius: 8px;
-    font-size: 1.1em;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
-}
