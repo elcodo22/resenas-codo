@@ -11,6 +11,12 @@
     <div style="width: 80%; margin: auto; text-align: center;">
         <h1>Gráfico de Promedio de Reseñas por Mes</h1>
 
+        <!-- Formulario para subir archivo CSV -->
+        <div style="margin-bottom: 20px;">
+            <label for="csvFile">Sube un archivo CSV:</label>
+            <input type="file" id="csvFile" accept=".csv" onchange="uploadFile()">
+        </div>
+
         <!-- Selector de Año (deshabilitado inicialmente) -->
         <label for="yearSelect">Selecciona un Año:</label>
         <select id="yearSelect" onchange="onYearChange()" disabled>
@@ -24,6 +30,6 @@
     </div>
 
     <!-- Incluir archivo JavaScript -->
-    <script src="app.js"></script>
+    <script src="script.js"></script>
 </body>
 </html>
