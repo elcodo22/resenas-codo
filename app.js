@@ -1,5 +1,3 @@
-// Variables globales
-let resumenDatos = {}; // Aquí se guardarán los datos de las reseñas por año
 
 // Función para subir el archivo CSV
 const uploadFile = async () => {
@@ -26,124 +24,148 @@ const uploadFile = async () => {
             alert(result.mensaje); // Confirmación
         }
 
-        cargarResumenDesdeDynamo(); // Refrescar gráfico
-
     } catch (error) {
         console.error('Error al subir el archivo:', error);
         alert('Error al subir el archivo.');
     }
 };
 
-// Cargar datos desde DynamoDB
+// Función para cargar los resúmenes mensuales desde DynamoDB
 const cargarResumenDesdeDynamo = async () => {
     try {
         const response = await fetch('http://35.177.116.70:3000/leer-dynamo');
         const result = await response.json();
 
         if (result && result.resumen_mensual) {
-            resumenDatos = result.resumen_mensual;
-
-            // Obtener años disponibles
-            const años = Object.keys(resumenDatos).map(f => f.substring(0, 4));
-            const añosUnicos = [...new Set(años)].sort();
-            const añoMasReciente = añosUnicos[añosUnicos.length - 1];
-
-            // Mostrar gráfico automáticamente para el año más reciente
-            mostrarGrafico(añoMasReciente);
-
+            console.log("Datos recibidos desde DynamoDB:", result.resumen_mensual);
+            mostrarGrafico(result.resumen_mensual); // <-- aquí solo pasas el objeto con fechas
         } else {
             console.warn("No se encontró resumen en la respuesta.");
             alert("No se encontraron datos.");
         }
+
     } catch (error) {
         console.error('Error al recuperar los datos desde DynamoDB:', error);
     }
 };
 
-// Procesar datos para el gráfico
-const procesarDatos = (data, añoSeleccionado) => {
+
+// Función para agrupar los datos por mes y calcular el promedio ponderado
+// Función para agrupar los datos por mes y calcular el promedio ponderado
+const procesarDatos = (data) => {
     const resumenMensual = {};
 
-    for (const fecha in data) {
-        if (fecha.startsWith(añoSeleccionado)) {
-            const mes = fecha.substring(5, 7);
-            const valores = data[fecha];
+    for (const fechaCompleta in data) {
+        const valores = data[fechaCompleta];
+        const mes = fechaCompleta.substring(0, 7); // Extrae "2024-01" de "2024-01-02"
 
-            if (!resumenMensual[mes]) {
-                resumenMensual[mes] = { positivas: 0, negativas: 0, mixtas: 0, totalReseñas: 0 };
-            }
-
-            resumenMensual[mes].positivas += valores.positivas;
-            resumenMensual[mes].negativas += valores.negativas;
-            resumenMensual[mes].mixtas += valores.mixtas;
-            resumenMensual[mes].totalReseñas += valores.totalReseñas;
+        if (!resumenMensual[mes]) {
+            resumenMensual[mes] = {
+                positivas: 0,
+                negativas: 0,
+                mixtas: 0,
+                totalReseñas: 0
+            };
         }
+
+        resumenMensual[mes].positivas += valores.positivas;
+        resumenMensual[mes].negativas += valores.negativas;
+        resumenMensual[mes].mixtas += valores.mixtas;
+        resumenMensual[mes].totalReseñas += valores.totalReseñas;
     }
 
-    const meses = ["01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12"];
-    return meses.map(mes => {
-        const v = resumenMensual[mes] || { positivas: 0, mixtas: 0, negativas: 0, totalReseñas: 0 };
-        if (v.totalReseñas === 0) return 0;
-        return (v.positivas + v.mixtas * 0.5) / v.totalReseñas;
+    console.log('Resumen mensual agrupado correctamente:', resumenMensual);
+
+    const mesesOrdenados = [
+        "2024-01", "2024-02", "2024-03", "2024-04", "2024-05", 
+        "2024-06", "2024-07", "2024-08", "2024-09", "2024-10", 
+        "2024-11", "2024-12"
+    ];
+
+    const datosPromedioMensual = mesesOrdenados.map(mes => {
+        const valores = resumenMensual[mes] || { positivas: 0, negativas: 0, mixtas: 0, totalReseñas: 0 };
+
+        console.log(`Datos para el mes ${mes}:`, valores);
+
+        if (valores.totalReseñas === 0) return 0;
+
+        const puntuacion = (
+            valores.positivas * 1 +
+            valores.mixtas * 0.5 +
+            valores.negativas * 0
+        );
+
+        const promedio = puntuacion / valores.totalReseñas;
+
+        console.log(`Promedio para ${mes}: ${promedio}`);
+        return promedio;
     });
+
+    return datosPromedioMensual;
 };
 
-// Mostrar gráfico con Chart.js
-const mostrarGrafico = (añoSeleccionado) => {
+
+
+// Función para crear el gráfico con los datos procesados
+const mostrarGrafico = (data) => {
+    const meses = ["ENERO", "FEBRERO", "MARZO", "ABRIL", "MAYO", "JUNIO", "JULIO", "AGOSTO", "SEPTIEMBRE", "OCTUBRE", "NOVIEMBRE", "DICIEMBRE"];
+    
+    // Procesamos los datos para obtener los promedios mensuales
+    const datosPromedioMensual = procesarDatos(data);
+
+    // Verificar los datos procesados antes de graficar
+    console.log("Datos procesados para el gráfico:", datosPromedioMensual);
+
+    // Crear el gráfico usando Chart.js
     const ctx = document.getElementById('graficoResenas').getContext('2d');
-
-    if (window.chartInstance) {
-        window.chartInstance.destroy();
-    }
-
-    const datos = procesarDatos(resumenDatos, añoSeleccionado);
-
-    window.chartInstance = new Chart(ctx, {
-        type: 'line',
+    new Chart(ctx, {
+        type: 'line', // Tipo de gráfico lineal
         data: {
-            labels: ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"],
+            labels: meses, // Etiquetas del eje X (meses)
             datasets: [{
-                label: `Promedio de Reseñas en ${añoSeleccionado}`,
-                data: datos,
-                borderColor: 'rgba(75, 192, 192, 1)',
-                backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                fill: true,
-                tension: 0.4
+                label: 'Promedio de Reseñas por Mes',
+                data: datosPromedioMensual, // Datos calculados
+                borderColor: 'rgba(75, 192, 192, 1)', // Color de la línea
+                backgroundColor: 'rgba(75, 192, 192, 0.2)', // Color del área bajo la línea
+                fill: true, // Llenar el área bajo la línea
+                tension: 0.4 // Suavizar la línea
             }]
         },
-        options: {
-            responsive: true,
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    min: 0,
-                    max: 1,
-                    ticks: {
-                        stepSize: 0.25,
-                        callback: value => ({
-                            0: 'Muy Negativas',
-                            0.25: 'Negativas',
-                            0.5: 'Medias',
-                            0.75: 'Positivas',
-                            1: 'Muy Positivas'
-                        }[value] || '')
-                    },
-                    title: {
-                        display: true,
-                        text: 'Calidad de las reseñas'
-                    }
+       options: {
+    responsive: true,
+    scales: {
+        y: {
+            beginAtZero: true, // Asegura que el gráfico comience desde 0
+            min: 0,
+            max: 1, // Máximo valor del eje Y
+            ticks: {
+                stepSize: 0.25, // Paso de los valores en el eje Y
+                callback: function(value) {
+                    const etiquetas = {
+                        0: 'Muy Negativas',
+                        0.25: 'Negativas',
+                        0.5: 'Medias',
+                        0.75: 'Positivas',
+                        1: 'Muy Positivas'
+                    };
+                    return etiquetas[value] || '';
                 }
             },
-            plugins: {
-                tooltip: {
-                    callbacks: {
-                        label: tooltipItem => `Valor Promedio: ${tooltipItem.raw.toFixed(2)}`
-                    }
+            title: {
+                display: true,
+                text: 'Calidad de las reseñas' // Título del eje Y
+            }
+        }
+    },
+    plugins: {
+        tooltip: {
+            callbacks: {
+                label: function(tooltipItem) {
+                    return `Valor Promedio: ${tooltipItem.raw.toFixed(2)}`; // Mostrar el valor con 2 decimales
                 }
             }
         }
-    });
+    }
+}
+}); 
 };
-
-// Ejecutar al cargar la página
-window.onload = cargarResumenDesdeDynamo;
