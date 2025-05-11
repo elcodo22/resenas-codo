@@ -1,7 +1,7 @@
-/* Estilos generales de la página */
+/* Estilos generales */
 body {
-    font-family: 'Roboto', sans-serif;
-    background-color: #f3f4f6;
+    font-family: 'Arial', sans-serif;
+    background-color: #f8f9fa;
     margin: 0;
     padding: 0;
     display: flex;
@@ -14,144 +14,146 @@ body {
 /* Contenedor principal */
 .container {
     width: 80%;
-    max-width: 1100px;
+    max-width: 1000px;
     text-align: center;
-    padding: 20px;
-    border-radius: 10px;
-    background: linear-gradient(135deg, #6e7dff, #4e4bff);
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+    padding: 30px;
+    background-color: #fff;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
 }
 
 /* Título */
 h1 {
-    font-size: 2.8em;
-    color: white;
-    margin-bottom: 25px;
+    font-size: 2.5em;
+    color: #343a40;
+    margin-bottom: 30px;
     font-weight: 700;
-    text-shadow: 1px 1px 5px rgba(0, 0, 0, 0.2);
 }
 
 /* Formulario */
 .form-container {
+    padding: 25px;
     background-color: #fff;
-    padding: 30px;
-    border-radius: 12px;
-    box-shadow: 0 15px 25px rgba(0, 0, 0, 0.1);
-    width: 100%;
-    margin-bottom: 25px;
+    border-radius: 8px;
+    box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
 }
 
 .form-container label {
     font-size: 1.1em;
-    color: #444;
+    color: #495057;
 }
 
+/* Campos de entrada */
 .form-container input[type="file"],
 .form-container select {
     width: 100%;
     padding: 12px;
     margin-top: 12px;
-    border: 2px solid #d3d4d9;
-    border-radius: 8px;
-    background-color: #f9f9f9;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    background-color: #f1f3f5;
     font-size: 1em;
-    color: #333;
+    color: #495057;
     box-sizing: border-box;
-    transition: all 0.3s ease;
+    transition: border-color 0.3s ease;
 }
 
 .form-container input[type="file"]:hover,
 .form-container select:hover {
-    border-color: #6e7dff;
-    background-color: #fafafa;
+    border-color: #007bff;
 }
 
 .form-container input[type="file"]:focus,
 .form-container select:focus {
     outline: none;
-    border-color: #4e4bff;
-    box-shadow: 0 0 5px rgba(79, 75, 255, 0.5);
+    border-color: #0056b3;
+    box-shadow: 0 0 5px rgba(0, 0, 255, 0.4);
 }
 
 /* Botón de carga */
 .form-container button {
-    background-color: #6e7dff;
+    background-color: #007bff;
     color: white;
     padding: 12px 25px;
     margin-top: 20px;
     border: none;
-    border-radius: 50px;
-    font-size: 1.2em;
+    border-radius: 4px;
+    font-size: 1.1em;
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: background-color 0.3s ease, transform 0.2s ease;
     width: 100%;
 }
 
 .form-container button:hover {
-    background-color: #4e4bff;
+    background-color: #0056b3;
     transform: translateY(-3px);
+}
+
+.form-container button:active {
+    background-color: #004085;
 }
 
 /* Selector de Año */
 .year-selector {
     margin: 20px 0;
-    font-size: 1.3em;
-    padding: 12px 20px;
-    background-color: #ffffff;
-    border: 2px solid #d3d4d9;
-    border-radius: 8px;
-    box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+    font-size: 1.1em;
+    padding: 12px;
+    background-color: #fff;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
 
 .year-selector select {
     padding: 12px;
-    width: 200px;
-    border-radius: 8px;
-    border: 2px solid #ddd;
+    width: 220px;
+    border-radius: 4px;
+    border: 1px solid #ced4da;
     font-size: 1em;
-    color: #333;
+    color: #495057;
     box-sizing: border-box;
-    transition: all 0.3s ease;
+    transition: border-color 0.3s ease;
 }
 
 .year-selector select:hover {
-    border-color: #6e7dff;
+    border-color: #007bff;
 }
 
 .year-selector select:focus {
     outline: none;
-    border-color: #4e4bff;
-    box-shadow: 0 0 5px rgba(79, 75, 255, 0.5);
+    border-color: #0056b3;
+    box-shadow: 0 0 5px rgba(0, 0, 255, 0.4);
 }
 
 .year-selector label {
     margin-right: 15px;
-    color: #333;
+    color: #495057;
     font-weight: 600;
 }
 
 /* Gráfico */
 #graficoResenas {
-    max-width: 100%;
+    width: 100%;
     margin-top: 30px;
-    border-radius: 12px;
+    height: 400px;
+    border-radius: 8px;
     background-color: white;
-    box-shadow: 0 15px 25px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
 }
 
-/* Estilo para la alerta */
+/* Alertas */
 .alert {
-    background-color: #f44336;
+    background-color: #e74c3c;
     color: white;
     padding: 15px;
     margin-bottom: 20px;
-    border-radius: 10px;
-    font-size: 1.1em;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    border-radius: 8px;
+    font-size: 1em;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
 }
 
 .alert-success {
-    background-color: #4CAF50;
+    background-color: #28a745;
 }
 
 /* Responsividad */
@@ -165,12 +167,12 @@ h1 {
     }
 
     h1 {
-        font-size: 2.2em;
+        font-size: 2em;
     }
 
     .form-container button {
         padding: 12px 20px;
-        font-size: 1.1em;
+        font-size: 1em;
     }
 
     .year-selector select {
@@ -180,7 +182,7 @@ h1 {
 
 @media (max-width: 480px) {
     h1 {
-        font-size: 1.8em;
+        font-size: 1.5em;
     }
 
     .form-container button {
