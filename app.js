@@ -35,11 +35,18 @@ const uploadFile = async () => {
 const cargarResumenDesdeDynamo = async () => {
     try {
         const response = await fetch('http://35.177.116.70:3000/leer-dynamo');
+        
+        // Verificar si la respuesta es exitosa
+        if (!response.ok) {
+            throw new Error('Error al obtener los datos. Estado: ' + response.status);
+        }
+
         const result = await response.json();
 
+        // Validar la estructura de la respuesta
         if (result && result.resumen_mensual) {
             console.log("Datos recibidos desde DynamoDB:", result.resumen_mensual);
-            mostrarGrafico(result.resumen_mensual); // <-- aquí solo pasas el objeto con fechas
+            mostrarGrafico(result.resumen_mensual); // Solo pasas el objeto con fechas
         } else {
             console.warn("No se encontró resumen en la respuesta.");
             alert("No se encontraron datos.");
@@ -47,8 +54,10 @@ const cargarResumenDesdeDynamo = async () => {
 
     } catch (error) {
         console.error('Error al recuperar los datos desde DynamoDB:', error);
+        alert('Hubo un problema al intentar cargar los datos. Intenta más tarde.');
     }
 };
+
 
 
 // Función para agrupar los datos por mes y calcular el promedio ponderado
