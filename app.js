@@ -130,35 +130,39 @@ const mostrarGrafico = (data) => {
                 tension: 0.4 // Suavizar la línea
             }]
         },
-        options: {
-            responsive: true,
-            scales: {
-                y: {
-                    beginAtZero: true, // Asegura que el gráfico comience desde 0
-                    ticks: {
-                        stepSize: 0.25, // Paso de los valores en el eje Y
-                        max: 1, // Máximo valor del eje Y
-                    },
-                    title: {
-                        display: true,
-                        text: 'Sentimiento de las Reseñas' // Título del eje Y
-                    },
-                    labels: {
-                        0: 'NEGATIVA',
-                        0.5: 'MEDIA',
-                        1: 'POSITIVO'
-                    }
+       options: {
+    responsive: true,
+    scales: {
+        y: {
+            beginAtZero: true, // Asegura que el gráfico comience desde 0
+            min: 0,
+            max: 1, // Máximo valor del eje Y
+            ticks: {
+                stepSize: 0.25, // Paso de los valores en el eje Y
+                callback: function(value) {
+                    const etiquetas = {
+                        0: 'Muy Negativas',
+                        0.25: 'Negativas',
+                        0.5: 'Medias',
+                        0.75: 'Positivas',
+                        1: 'Muy Positivas'
+                    };
+                    return etiquetas[value] || '';
                 }
             },
-            plugins: {
-                tooltip: {
-                    callbacks: {
-                        label: function(tooltipItem) {
-                            return `Valor Promedio: ${tooltipItem.raw.toFixed(2)}`; // Mostrar el valor con 2 decimales
-                        }
-                    }
+            title: {
+                display: true,
+                text: 'Calidad de las reseñas' // Título del eje Y
+            }
+        }
+    },
+    plugins: {
+        tooltip: {
+            callbacks: {
+                label: function(tooltipItem) {
+                    return `Valor Promedio: ${tooltipItem.raw.toFixed(2)}`; // Mostrar el valor con 2 decimales
                 }
             }
         }
-    });
-};
+    }
+}
