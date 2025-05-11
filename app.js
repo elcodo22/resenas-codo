@@ -166,3 +166,5 @@ const mostrarGrafico = (data) => {
         }
     }
 }
+}); 
+};
