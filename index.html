@@ -1,38 +1,32 @@
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Gráfico de Reseñas</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gráfico de Promedio de Reseñas</title>
+    <!-- Cargar Chart.js desde CDN -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            padding: 20px;
-        }
-
-        #graficoResenas {
-            max-width: 800px;
-            margin: auto;
-        }
-
-        .upload-container {
-            margin-bottom: 20px;
-            text-align: center;
-        }
-
-        button {
-            margin-left: 10px;
-        }
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        table { border-collapse: collapse; width: 100%; margin-top: 20px; }
+        th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+        th { background-color: #f2f2f2; }
+        button { padding: 10px 20px; margin: 10px; background-color: #007bff; color: white; border: none; cursor: pointer; }
+        button:hover { background-color: #0056b3; }
+        canvas { width: 100%; height: 400px; }
     </style>
 </head>
 <body>
-    <div class="upload-container">
-        <input type="file" id="csvFile" accept=".csv" />
-        <button onclick="uploadFile()">Subir CSV</button>
-    </div>
+    <h1>Subir archivo CSV y ver gráfico de reseñas</h1>
 
-    <canvas id="graficoResenas" width="800" height="400"></canvas>
+    <input type="file" id="csvFile" accept=".csv" />
+    <button onclick="uploadFile()">Subir CSV a S3</button>
+    <button onclick="cargarResumenDesdeDynamo()">Leer desde DynamoDB</button>
 
-    <script src="app.js"></script> <!-- Asegúrate que aquí esté tu JS -->
+    <!-- Contenedor para mostrar el gráfico -->
+    <canvas id="graficoResenas"></canvas>
+
+    <script src="app.js"></script> <!-- Cargar el archivo JavaScript separado -->
 </body>
 </html>
