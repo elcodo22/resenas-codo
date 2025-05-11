@@ -124,7 +124,16 @@ const procesarDatos = (data, añoSeleccionado) => {
 };
 
 // Función para crear el gráfico con los datos procesados
+// Función para crear el gráfico con los datos procesados
 const mostrarGrafico = (añoSeleccionado) => {
+    // Verificar si ya existe un gráfico en el canvas
+    const ctx = document.getElementById('graficoResenas').getContext('2d');
+    
+    // Si hay un gráfico previo, lo destruimos
+    if (window.chartInstance) {
+        window.chartInstance.destroy();
+    }
+
     // Procesamos los datos para obtener los promedios mensuales
     const datosPromedioMensual = procesarDatos(resumenDatos, añoSeleccionado);
 
@@ -132,8 +141,7 @@ const mostrarGrafico = (añoSeleccionado) => {
     console.log("Datos procesados para el gráfico:", datosPromedioMensual);
 
     // Crear el gráfico usando Chart.js
-    const ctx = document.getElementById('graficoResenas').getContext('2d');
-    new Chart(ctx, {
+    window.chartInstance = new Chart(ctx, {
         type: 'line', // Tipo de gráfico lineal
         data: {
             labels: ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"], // Meses del año
