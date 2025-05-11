@@ -47,3 +47,8 @@ button:hover {
 input[type="file"] {
     margin-right: 10px;
 }
+#graficoResenas {
+    width: 400px; /* Ajusta el tamaño según lo que desees */
+    height: 300px; /* Ajusta el tamaño según lo que desees */
+}
+
