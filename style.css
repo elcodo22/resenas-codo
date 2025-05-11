@@ -1,54 +1,147 @@
+/* Estilos generales de la página */
 body {
-    font-family: Arial, sans-serif;
-    margin: 0;
-    padding: 20px;
+    font-family: 'Arial', sans-serif;
     background-color: #f4f4f9;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    flex-direction: column;
 }
 
-h1 {
-    text-align: center;
-    margin-bottom: 20px;
-}
-
+/* Contenedor principal */
 .container {
-    max-width: 800px;
-    margin: 0 auto;
-    padding: 20px;
-    background-color: #fff;
-    border-radius: 8px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-}
-
-canvas {
-    width: 100%;
-    height: 400px;
-}
-
-.button-container, .file-upload {
-    text-align: center;
+    width: 80%;
+    max-width: 1200px;
     margin-top: 20px;
+    text-align: center;
 }
 
-button {
-    padding: 10px 20px;
-    font-size: 16px;
-    background-color: #007bff;
+/* Título */
+h1 {
+    font-size: 2.5em;
+    color: #333;
+    margin-bottom: 20px;
+    font-weight: 600;
+}
+
+/* Formulario */
+.form-container {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    margin-bottom: 30px;
+}
+
+.form-container label {
+    font-size: 1.1em;
+    color: #555;
+}
+
+.form-container input[type="file"],
+.form-container select {
+    width: 100%;
+    padding: 10px;
+    margin-top: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+    font-size: 1em;
+}
+
+.form-container input[type="file"] {
+    font-size: 0.9em;
+}
+
+/* Botón de carga */
+.form-container button {
+    background-color: #4CAF50;
     color: white;
+    padding: 12px 20px;
+    margin-top: 20px;
     border: none;
     border-radius: 5px;
+    font-size: 1.1em;
     cursor: pointer;
     transition: background-color 0.3s;
 }
 
-button:hover {
-    background-color: #0056b3;
+.form-container button:hover {
+    background-color: #45a049;
 }
 
-input[type="file"] {
-    margin-right: 10px;
-}
+/* Gráfico */
 #graficoResenas {
-    width: 400px; /* Ajusta el tamaño según lo que desees */
-    height: 300px; /* Ajusta el tamaño según lo que desees */
+    max-width: 100%;
+    margin-top: 30px;
+    border: 2px solid #ddd;
+    border-radius: 10px;
+    background-color: #fff;
 }
 
+/* Selector de Año */
+.year-selector {
+    margin: 20px 0;
+    font-size: 1.2em;
+    padding: 10px 20px;
+    background-color: #ffffff;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+}
+
+.year-selector select {
+    padding: 10px;
+    width: 200px;
+    border-radius: 5px;
+    border: 1px solid #ddd;
+    font-size: 1em;
+}
+
+.year-selector label {
+    margin-right: 10px;
+    color: #555;
+    font-weight: 600;
+}
+
+/* Estilo para la alerta */
+.alert {
+    background-color: #f44336;
+    color: white;
+    padding: 15px;
+    margin-bottom: 20px;
+    border-radius: 5px;
+    font-size: 1.1em;
+}
+
+.alert-success {
+    background-color: #4CAF50;
+}
+
+/* Responsividad */
+@media (max-width: 768px) {
+    .container {
+        width: 90%;
+    }
+
+    .form-container {
+        padding: 15px;
+    }
+
+    h1 {
+        font-size: 2em;
+    }
+
+    .form-container button {
+        padding: 10px 15px;
+        font-size: 1em;
+    }
+
+    .year-selector select {
+        width: 150px;
+    }
+}
