@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gráfico de Reseñas Mensuales</title>
-    <!-- Incluir Chart.js desde un CDN -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="style.css">
 </head>
@@ -15,23 +14,29 @@
         <!-- Formulario para subir archivo CSV -->
         <div class="form-container">
             <label for="csvFile">Sube un archivo CSV:</label>
-            <input type="file" id="csvFile" accept=".csv" onchange="uploadFile()">
+            <input type="file" id="csvFile" accept=".csv">
         </div>
 
-        <!-- Selector de Año (deshabilitado inicialmente) -->
+        <!-- Selector de Año -->
         <div class="year-selector">
             <label for="yearSelect">Selecciona un Año:</label>
-            <select id="yearSelect" onchange="onYearChange()" disabled>
-                <!-- Opciones de años se llenarán dinámicamente -->
+            <select id="yearSelect" disabled>
+                <!-- Opciones se llenan dinámicamente -->
             </select>
         </div>
 
+        <!-- Botones -->
+        <div class="button-group">
+            <button id="btnUpload" onclick="uploadFile()">Subir Archivo</button>
+            <button id="btnSubmit" onclick="submitData()">Enviar Datos</button>
+        </div>
+
+        <!-- Gráfico -->
         <div>
             <canvas id="graficoResenas"></canvas>
         </div>
     </div>
 
-    <!-- Incluir archivo JavaScript -->
     <script src="app.js"></script>
 </body>
 </html>
