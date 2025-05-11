@@ -1,98 +1,55 @@
+
 body {
-    font-family: 'Roboto', sans-serif;
-    background-color: #f4f6f9;
+    font-family: Arial, sans-serif;
     margin: 0;
-    padding: 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    flex-direction: column;
-}
-
-.container {
-    width: 90%;
-    max-width: 1000px;
-    text-align: center;
-    padding: 40px;
-    background-color: #fff;
-    border-radius: 16px;
-    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.1);
-    transition: all 0.3s ease;
-}
-
-.container:hover {
-    box-shadow: 0 18px 40px rgba(0, 0, 0, 0.15);
+    padding: 20px;
+    background-color: #f4f4f9;
 }
 
 h1 {
-    font-size: 2.8em;
-    color: #333;
-    margin-bottom: 30px;
-    font-weight: 600;
-    letter-spacing: -1px;
-    transition: color 0.3s;
-}
-
-.form-container,
-.year-selector {
+    text-align: center;
     margin-bottom: 20px;
 }
 
-label {
-    font-size: 1.2em;
-    color: #495057;
-    margin-bottom: 8px;
-    font-weight: 500;
-    display: block;
-}
-
-input[type="file"],
-select {
-    width: 100%;
-    padding: 15px;
-    margin-top: 10px;
-    border: 2px solid #ccc;
+.container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #fff;
     border-radius: 8px;
-    background-color: #f0f3f5;
-    font-size: 1.05em;
-    color: #495057;
-    transition: border-color 0.3s, background-color 0.3s;
-    outline: none;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
-input[type="file"]:hover,
-select:hover {
-    border-color: #0056b3;
-    background-color: #e9f4ff;
-}
-
-input[type="file"]:focus,
-select:focus {
-    border-color: #003366;
-    background-color: #e3f1ff;
-    box-shadow: 0 0 8px rgba(0, 123, 255, 0.4);
-}
-
-.year-selector select {
+canvas {
     width: 100%;
-    padding: 15px;
-    margin-top: 10px;
-    border-radius: 8px;
-    border: 2px solid #ccc;
-    background-color: #f0f3f5;
-    font-size: 1.05em;
-    color: #495057;
-    transition: border-color 0.3s, background-color 0.3s;
+    height: 400px;
 }
 
-/* Grupo de botones */
-.button-group {
-    display: flex;
-    justify-content: center;
-    margin-top: 30px;
+.button-container, .file-upload {
+    text-align: center;
+    margin-top: 20px;
 }
 
-/* Botón único */
 button {
-    background: linear-gradient(45deg, #007bff, #0056b3);
+    padding: 10px 20px;
+    font-size: 16px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+button:hover {
+    background-color: #0056b3;
+}
+
+input[type="file"] {
+    margin-right: 10px;
+}
+#graficoResenas {
+    width: 400px; /* Ajusta el tamaño según lo que desees */
+    height: 300px; /* Ajusta el tamaño según lo que desees */
+}
+
