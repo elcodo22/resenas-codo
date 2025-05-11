@@ -1,3 +1,7 @@
+// Variables globales
+let resumenDatos = {}; // Aquí se guardarán los datos de las reseñas por año
+let añosDisponibles = []; // Aquí se guardarán los años disponibles
+
 // Función para subir el archivo CSV
 const uploadFile = async () => {
     const fileInput = document.getElementById('csvFile');
@@ -23,16 +27,14 @@ const uploadFile = async () => {
             alert(result.mensaje); // Confirmación
         }
 
+        // Recargar los datos después de subir el CSV
+        cargarResumenDesdeDynamo();
+        
     } catch (error) {
         console.error('Error al subir el archivo:', error);
         alert('Error al subir el archivo.');
     }
 };
-
-// Función para cargar los resúmenes mensuales desde DynamoDB
-// Variables globales
-let resumenDatos = {}; // Aquí se guardarán los datos de las reseñas por año
-let añosDisponibles = []; // Aquí se guardarán los años disponibles
 
 // Función para cargar los resúmenes mensuales desde DynamoDB
 const cargarResumenDesdeDynamo = async () => {
@@ -194,4 +196,3 @@ const onYearChange = () => {
 
 // Cargar los datos al inicio
 window.onload = cargarResumenDesdeDynamo;
-
