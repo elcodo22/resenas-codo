@@ -32,21 +32,43 @@ const uploadFile = async () => {
 };
 
 // Función para cargar los resúmenes mensuales desde DynamoDB
+// Función para cargar los resúmenes mensuales desde DynamoDB
 const cargarResumenDesdeDynamo = async () => {
     try {
         const response = await fetch('http://35.177.116.70:3000/leer-dynamo');
         
-        // Verificar si la respuesta es exitosa
         if (!response.ok) {
             throw new Error('Error al obtener los datos. Estado: ' + response.status);
         }
 
         const result = await response.json();
 
-        // Validar la estructura de la respuesta
         if (result && result.resumen_mensual) {
             console.log("Datos recibidos desde DynamoDB:", result.resumen_mensual);
-            mostrarGrafico(result.resumen_mensual); // Solo pasas el objeto con fechas
+            resumenDatos = result.resumen_mensual;
+            
+            // Extraer años disponibles
+            const añosDisponibles = [...new Set(
+                Object.keys(resumenDatos).map(fecha => fecha.substring(0, 4))
+            )];
+            
+            // Actualizar selector de años
+            const yearSelect = document.getElementById('yearSelect');
+            if (yearSelect) {
+                yearSelect.innerHTML = ''; // Limpiar opciones anteriores
+                añosDisponibles.forEach(año => {
+                    const option = document.createElement('option');
+                    option.value = año;
+                    option.textContent = año;
+                    yearSelect.appendChild(option);
+                });
+                yearSelect.disabled = false;
+                
+                // Mostrar gráfico con el primer año disponible
+                if (añosDisponibles.length > 0) {
+                    mostrarGrafico(añosDisponibles[0]);
+                }
+            }
         } else {
             console.warn("No se encontró resumen en la respuesta.");
             alert("No se encontraron datos.");
