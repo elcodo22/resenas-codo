@@ -7,26 +7,26 @@
     <!-- Incluir Chart.js desde un CDN -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="style.css">
-
 </head>
 <body>
-    <div style="width: 80%; margin: auto; text-align: center;">
+    <div class="container">
         <h1>Gráfico de Promedio de Reseñas por Mes</h1>
 
         <!-- Formulario para subir archivo CSV -->
-        <div style="margin-bottom: 20px;">
+        <div class="form-container">
             <label for="csvFile">Sube un archivo CSV:</label>
             <input type="file" id="csvFile" accept=".csv" onchange="uploadFile()">
         </div>
 
         <!-- Selector de Año (deshabilitado inicialmente) -->
-        <label for="yearSelect">Selecciona un Año:</label>
-        <select id="yearSelect" onchange="onYearChange()" disabled>
-            <!-- Opciones de años se llenarán dinámicamente -->
-        </select>
+        <div class="year-selector">
+            <label for="yearSelect">Selecciona un Año:</label>
+            <select id="yearSelect" onchange="onYearChange()" disabled>
+                <!-- Opciones de años se llenarán dinámicamente -->
+            </select>
+        </div>
 
-        <div style="margin-top: 30px;">
-            <!-- El canvas donde se mostrará el gráfico -->
+        <div>
             <canvas id="graficoResenas"></canvas>
         </div>
     </div>
