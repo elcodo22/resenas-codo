@@ -30,6 +30,10 @@ const uploadFile = async () => {
 };
 
 // Función para cargar los resúmenes mensuales desde DynamoDB
+// Variables globales
+let resumenDatos = {}; // Aquí se guardarán los datos de las reseñas por año
+let añosDisponibles = []; // Aquí se guardarán los años disponibles
+
 // Función para cargar los resúmenes mensuales desde DynamoDB
 const cargarResumenDesdeDynamo = async () => {
     try {
@@ -38,18 +42,28 @@ const cargarResumenDesdeDynamo = async () => {
 
         if (result && result.resumen_mensual) {
             console.log("Datos recibidos desde DynamoDB:", result.resumen_mensual);
+            resumenDatos = result.resumen_mensual;
 
-            // Filtramos los datos y obtenemos los años disponibles
-            availableYears = obtenerAniosDisponibles(result.resumen_mensual);
-            console.log('Años disponibles:', availableYears);
+            // Extraer años disponibles
+            añosDisponibles = Object.keys(resumenDatos).map(fecha => fecha.substring(0, 4));
+            añosDisponibles = [...new Set(añosDisponibles)]; // Eliminar duplicados
 
-            // Llenar el selector con los años disponibles
-            llenarSelectorAnios(availableYears);
+            // Llenar el selector de años con las opciones
+            const yearSelect = document.getElementById('yearSelect');
+            añosDisponibles.forEach(año => {
+                const option = document.createElement('option');
+                option.value = año;
+                option.textContent = año;
+                yearSelect.appendChild(option);
+            });
 
-            // Cargar el gráfico con el primer año disponible (o el año actual si existe en los datos)
-            const yearSelected = availableYears[0] || new Date().getFullYear();
-            document.getElementById('yearSelect').value = yearSelected;
-            mostrarGrafico(result.resumen_mensual, yearSelected); // Mostrar gráfico con el primer año
+            // Habilitar el selector de años
+            yearSelect.disabled = false;
+
+            // Mostrar el gráfico con el primer año disponible
+            if (añosDisponibles.length > 0) {
+                mostrarGrafico(añosDisponibles[0]);
+            }
         } else {
             console.warn("No se encontró resumen en la respuesta.");
             alert("No se encontraron datos.");
@@ -59,83 +73,40 @@ const cargarResumenDesdeDynamo = async () => {
     }
 };
 
-// Función para obtener los años disponibles a partir de las fechas de las reseñas
-const obtenerAniosDisponibles = (data) => {
-    const anios = new Set();
-    for (const fechaCompleta in data) {
-        const anio = fechaCompleta.substring(0, 4); // Extraemos el año de la fecha
-        anios.add(anio); // Agregar el año al conjunto (evita duplicados)
-    }
-    return Array.from(anios); // Convertimos el conjunto a un arreglo
-};
-
-// Función para llenar el selector de años
-const llenarSelectorAnios = (anios) => {
-    const selectElement = document.getElementById('yearSelect');
-    selectElement.innerHTML = ''; // Limpiar el selector
-
-    anios.forEach((anio) => {
-        const option = document.createElement('option');
-        option.value = anio;
-        option.textContent = anio;
-        selectElement.appendChild(option);
-    });
-};
-
-// Función para filtrar los datos por el año seleccionado
-const filtrarPorAno = (data, year) => {
-    const filteredData = {};
-    for (const fechaCompleta in data) {
-        if (fechaCompleta.startsWith(year)) {  // Filtramos solo las fechas que comienzan con el año seleccionado
-            filteredData[fechaCompleta] = data[fechaCompleta];
-        }
-    }
-    return filteredData;
-};
-
-// Función para procesar los datos y graficar
-const procesarDatos = (data) => {
+// Función para procesar los datos y crear el gráfico
+const procesarDatos = (data, añoSeleccionado) => {
     const resumenMensual = {};
-    for (const fechaCompleta in data) {
-        const valores = data[fechaCompleta];
-        const mes = fechaCompleta.substring(0, 7); // Extrae "2024-01" de "2024-01-02"
-
-        if (!resumenMensual[mes]) {
-            resumenMensual[mes] = {
-                positivas: 0,
-                negativas: 0,
-                mixtas: 0,
-                totalReseñas: 0
-            };
-        }
-
-        resumenMensual[mes].positivas += valores.positivas;
-        resumenMensual[mes].negativas += valores.negativas;
-        resumenMensual[mes].mixtas += valores.mixtas;
-        resumenMensual[mes].totalReseñas += valores.totalReseñas;
-    }
-
-    return resumenMensual;
-};
-
-// Función para crear el gráfico con los datos procesados
-const mostrarGrafico = (data, year) => {
-    // Generar los meses dinámicamente para el año seleccionado
-    const meses = [];
-    for (let i = 1; i <= 12; i++) {
-        const mes = String(i).padStart(2, '0'); // Formatear el mes para que tenga siempre dos dígitos
-        meses.push(`${year}-${mes}`);
-    }
 
     // Filtrar los datos por el año seleccionado
-    const datosFiltrados = filtrarPorAno(data, year);
+    for (const fechaCompleta in data) {
+        if (fechaCompleta.startsWith(añoSeleccionado)) {
+            const valores = data[fechaCompleta];
+            const mes = fechaCompleta.substring(5, 7); // Extrae el mes
 
-    // Procesar los datos para obtener los promedios mensuales
-    const datosPromedioMensual = procesarDatos(datosFiltrados);
+            if (!resumenMensual[mes]) {
+                resumenMensual[mes] = {
+                    positivas: 0,
+                    negativas: 0,
+                    mixtas: 0,
+                    totalReseñas: 0
+                };
+            }
 
-    // Generar los promedios para cada mes
-    const promedios = meses.map(mes => {
-        const valores = datosPromedioMensual[mes] || { positivas: 0, negativas: 0, mixtas: 0, totalReseñas: 0 };
+            resumenMensual[mes].positivas += valores.positivas;
+            resumenMensual[mes].negativas += valores.negativas;
+            resumenMensual[mes].mixtas += valores.mixtas;
+            resumenMensual[mes].totalReseñas += valores.totalReseñas;
+        }
+    }
+
+    // Crear el arreglo de promedios para los 12 meses
+    const mesesOrdenados = [
+        "01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12"
+    ];
+
+    const datosPromedioMensual = mesesOrdenados.map(mes => {
+        const valores = resumenMensual[mes] || { positivas: 0, negativas: 0, mixtas: 0, totalReseñas: 0 };
+
         if (valores.totalReseñas === 0) return 0;
 
         const puntuacion = (
@@ -147,34 +118,41 @@ const mostrarGrafico = (data, year) => {
         return puntuacion / valores.totalReseñas;
     });
 
+    return datosPromedioMensual;
+};
+
+// Función para crear el gráfico con los datos procesados
+const mostrarGrafico = (añoSeleccionado) => {
+    // Procesamos los datos para obtener los promedios mensuales
+    const datosPromedioMensual = procesarDatos(resumenDatos, añoSeleccionado);
+
+    // Verificar los datos procesados antes de graficar
+    console.log("Datos procesados para el gráfico:", datosPromedioMensual);
+
+    // Crear el gráfico usando Chart.js
     const ctx = document.getElementById('graficoResenas').getContext('2d');
     new Chart(ctx, {
-        type: 'line',
+        type: 'line', // Tipo de gráfico lineal
         data: {
-            labels: meses.map(mes => {
-                const mesNum = parseInt(mes.substring(5, 7), 10); // Extraemos el mes como número
-                const mesesNombre = ["ENERO", "FEBRERO", "MARZO", "ABRIL", "MAYO", "JUNIO", "JULIO", "AGOSTO", "SEPTIEMBRE", "OCTUBRE", "NOVIEMBRE", "DICIEMBRE"];
-                return mesesNombre[mesNum - 1]; // Mapear el número del mes a su nombre
-            }),
+            labels: ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"], // Meses del año
             datasets: [{
-                label: 'Promedio de Reseñas por Mes',
-                data: promedios,
-                borderColor: 'rgba(75, 192, 192, 1)',
-                backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                fill: true,
-                tension: 0.4
+                label: `Promedio de Reseñas en ${añoSeleccionado}`,
+                data: datosPromedioMensual, // Datos calculados
+                borderColor: 'rgba(75, 192, 192, 1)', // Color de la línea
+                backgroundColor: 'rgba(75, 192, 192, 0.2)', // Color del área bajo la línea
+                fill: true, // Llenar el área bajo la línea
+                tension: 0.4 // Suavizar la línea
             }]
         },
         options: {
             responsive: true,
-            maintainAspectRatio: false,
             scales: {
                 y: {
-                    beginAtZero: true,
+                    beginAtZero: true, // Asegura que el gráfico comience desde 0
                     min: 0,
-                    max: 1,
+                    max: 1, // Máximo valor del eje Y
                     ticks: {
-                        stepSize: 0.25,
+                        stepSize: 0.25, // Paso de los valores en el eje Y
                         callback: function(value) {
                             const etiquetas = {
                                 0: 'Muy Negativas',
@@ -188,7 +166,7 @@ const mostrarGrafico = (data, year) => {
                     },
                     title: {
                         display: true,
-                        text: 'Calidad de las reseñas'
+                        text: 'Calidad de las reseñas' // Título del eje Y
                     }
                 }
             },
@@ -196,7 +174,7 @@ const mostrarGrafico = (data, year) => {
                 tooltip: {
                     callbacks: {
                         label: function(tooltipItem) {
-                            return `Valor Promedio: ${tooltipItem.raw.toFixed(2)}`;
+                            return `Valor Promedio: ${tooltipItem.raw.toFixed(2)}`; // Mostrar el valor con 2 decimales
                         }
                     }
                 }
@@ -205,5 +183,15 @@ const mostrarGrafico = (data, year) => {
     });
 };
 
+// Función que se ejecuta cuando el usuario cambia el año
+const onYearChange = () => {
+    const yearSelect = document.getElementById('yearSelect');
+    const selectedYear = yearSelect.value;
+
+    // Mostrar gráfico para el año seleccionado
+    mostrarGrafico(selectedYear);
+};
+
 // Cargar los datos al inicio
-cargarResumenDesdeDynamo();
+window.onload = cargarResumenDesdeDynamo;
+
