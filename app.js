@@ -1,3 +1,4 @@
+let resumenDatos = {}; // Aquí se guardarán los datos de las reseñas por año
 
 // Función para subir el archivo CSV
 const uploadFile = async () => {
