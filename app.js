@@ -82,30 +82,58 @@ const procesarDatos = (data) => {
         "2024-11", "2024-12"
     ];
     
+    const procesarDatos = (data) => {
+    const resumenMensual = {};
+
+    for (const fechaCompleta in data) {
+        const valores = data[fechaCompleta];
+        const mes = fechaCompleta.substring(0, 7); // Extrae "2024-01" de "2024-01-02"
+
+        if (!resumenMensual[mes]) {
+            resumenMensual[mes] = {
+                positivas: 0,
+                negativas: 0,
+                mixtas: 0,
+                totalReseñas: 0
+            };
+        }
+
+        resumenMensual[mes].positivas += valores.positivas;
+        resumenMensual[mes].negativas += valores.negativas;
+        resumenMensual[mes].mixtas += valores.mixtas;
+        resumenMensual[mes].totalReseñas += valores.totalReseñas;
+    }
+
+    console.log('Resumen mensual agrupado correctamente:', resumenMensual);
+
+    const mesesOrdenados = [
+        "2024-01", "2024-02", "2024-03", "2024-04", "2024-05", 
+        "2024-06", "2024-07", "2024-08", "2024-09", "2024-10", 
+        "2024-11", "2024-12"
+    ];
+
     const datosPromedioMensual = mesesOrdenados.map(mes => {
         const valores = resumenMensual[mes] || { positivas: 0, negativas: 0, mixtas: 0, totalReseñas: 0 };
 
-        // Mostrar los valores para cada mes antes de calcular el promedio ponderado
         console.log(`Datos para el mes ${mes}:`, valores);
 
-        if (valores.totalReseñas === 0) return 0;  // Si no hay reseñas para este mes, devolvemos 0.
+        if (valores.totalReseñas === 0) return 0;
 
-        const puntuacionPositivas = valores.positivas * 1;  // Positivas = 1
-        const puntuacionMixtas = valores.mixtas * 0.5;     // Mixtas = 0.5
-        const puntuacionNegativas = valores.negativas * 0;  // Negativas = 0
+        const puntuacion = (
+            valores.positivas * 1 +
+            valores.mixtas * 0.5 +
+            valores.negativas * 0
+        );
 
-        // Promedio ponderado
-        const totalPonderado = puntuacionPositivas + puntuacionMixtas + puntuacionNegativas;
-        const promedio = totalPonderado / valores.totalReseñas;
+        const promedio = puntuacion / valores.totalReseñas;
 
-        // Mostrar el resultado del promedio para cada mes
-        console.log(`Promedio para ${mes}:`, promedio);
-
+        console.log(`Promedio para ${mes}: ${promedio}`);
         return promedio;
     });
 
     return datosPromedioMensual;
 };
+
 
 // Función para crear el gráfico con los datos procesados
 const mostrarGrafico = (data) => {
