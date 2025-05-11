@@ -139,65 +139,66 @@ const procesarDatos = (data) => {
 
 
 // Función para crear el gráfico con los datos procesados
-const mostrarGrafico = (data) => {
-    const meses = ["ENERO", "FEBRERO", "MARZO", "ABRIL", "MAYO", "JUNIO", "JULIO", "AGOSTO", "SEPTIEMBRE", "OCTUBRE", "NOVIEMBRE", "DICIEMBRE"];
+let chartInstance = null;
+
+const mostrarGrafico = (añoSeleccionado) => {
+    const ctx = document.getElementById('graficoResenas');
+    if (!ctx) {
+        console.error('No se encontró el elemento canvas');
+        return;
+    }
+
+    // Destruir gráfico anterior si existe
+    if (chartInstance) {
+        chartInstance.destroy();
+    }
+
+    // Procesar datos para el año seleccionado
+    const datosProcesados = procesarDatos(resumenDatos, añoSeleccionado);
     
-    // Procesamos los datos para obtener los promedios mensuales
-    const datosPromedioMensual = procesarDatos(data);
-
-    // Verificar los datos procesados antes de graficar
-    console.log("Datos procesados para el gráfico:", datosPromedioMensual);
-
-    // Crear el gráfico usando Chart.js
-    const ctx = document.getElementById('graficoResenas').getContext('2d');
-    new Chart(ctx, {
-        type: 'line', // Tipo de gráfico lineal
+    chartInstance = new Chart(ctx, {
+        type: 'line',
         data: {
-            labels: meses, // Etiquetas del eje X (meses)
+            labels: ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"],
             datasets: [{
-                label: 'Promedio de Reseñas por Mes',
-                data: datosPromedioMensual, // Datos calculados
-                borderColor: 'rgba(75, 192, 192, 1)', // Color de la línea
-                backgroundColor: 'rgba(75, 192, 192, 0.2)', // Color del área bajo la línea
-                fill: true, // Llenar el área bajo la línea
-                tension: 0.4 // Suavizar la línea
+                label: `Promedio de reseñas ${añoSeleccionado}`,
+                data: datosProcesados,
+                borderColor: 'rgb(75, 192, 192)',
+                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                fill: true,
+                tension: 0.4
             }]
         },
-       options: {
-    responsive: true,
-    scales: {
-        y: {
-            beginAtZero: true, // Asegura que el gráfico comience desde 0
-            min: 0,
-            max: 1, // Máximo valor del eje Y
-            ticks: {
-                stepSize: 0.25, // Paso de los valores en el eje Y
-                callback: function(value) {
-                    const etiquetas = {
-                        0: 'Muy Negativas',
-                        0.25: 'Negativas',
-                        0.5: 'Medias',
-                        0.75: 'Positivas',
-                        1: 'Muy Positivas'
-                    };
-                    return etiquetas[value] || '';
+        options: {
+            responsive: true,
+            plugins: {
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return `Promedio: ${context.raw.toFixed(2)}`;
+                        }
+                    }
                 }
             },
-            title: {
-                display: true,
-                text: 'Calidad de las reseñas' // Título del eje Y
-            }
-        }
-    },
-    plugins: {
-        tooltip: {
-            callbacks: {
-                label: function(tooltipItem) {
-                    return `Valor Promedio: ${tooltipItem.raw.toFixed(2)}`; // Mostrar el valor con 2 decimales
+            scales: {
+                y: {
+                    min: 0,
+                    max: 1,
+                    ticks: {
+                        stepSize: 0.25,
+                        callback: function(value) {
+                            const etiquetas = {
+                                0: 'Muy Negativas',
+                                0.25: 'Negativas',
+                                0.5: 'Neutrales',
+                                0.75: 'Positivas',
+                                1: 'Muy Positivas'
+                            };
+                            return etiquetas[value] || '';
+                        }
+                    }
                 }
             }
         }
-    }
-}
-}); 
+    });
 };
