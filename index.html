@@ -3,29 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gráfico de Promedio de Reseñas</title>
-    <!-- Cargar Chart.js desde CDN -->
+    <title>Gráfico de Reseñas Mensuales</title>
+    <!-- Incluir Chart.js desde un CDN -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <style>
-        body { font-family: Arial, sans-serif; padding: 20px; }
-        table { border-collapse: collapse; width: 100%; margin-top: 20px; }
-        th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
-        th { background-color: #f2f2f2; }
-        button { padding: 10px 20px; margin: 10px; background-color: #007bff; color: white; border: none; cursor: pointer; }
-        button:hover { background-color: #0056b3; }
-        canvas { width: 100%; height: 400px; }
-    </style>
 </head>
 <body>
-    <h1>Subir archivo CSV y ver gráfico de reseñas</h1>
+    <div style="width: 80%; margin: auto; text-align: center;">
+        <h1>Gráfico de Promedio de Reseñas por Mes</h1>
 
-    <input type="file" id="csvFile" accept=".csv" />
-    <button onclick="uploadFile()">Subir CSV a S3</button>
-    <button onclick="cargarResumenDesdeDynamo()">Leer desde DynamoDB</button>
+        <!-- Selector de Año -->
+        <label for="yearSelect">Selecciona un Año:</label>
+        <select id="yearSelect" onchange="onYearChange()">
+            <!-- Opciones de años se llenarán dinámicamente -->
+        </select>
 
-    <!-- Contenedor para mostrar el gráfico -->
-    <canvas id="graficoResenas"></canvas>
+        <div style="margin-top: 30px;">
+            <!-- El canvas donde se mostrará el gráfico -->
+            <canvas id="graficoResenas"></canvas>
+        </div>
+    </div>
 
-    <script src="app.js"></script> <!-- Cargar el archivo JavaScript separado -->
+    <script>
+        // Aquí irá todo el código JavaScript que te proporcioné anteriormente
+    </script>
 </body>
 </html>
